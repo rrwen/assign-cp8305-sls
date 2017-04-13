@@ -1,0 +1,391 @@
+---
+title: "Natural Language Processing and Prediction of Sentiment Labelled Sentences"
+author: |
+  | Richard Wen
+  | Ryerson University
+date: "April 12, 2017"
+output:
+  bookdown::gitbook:
+    split_by: none
+  bookdown::pdf_document2:
+    fig_caption: yes
+    fig_height: 2
+    fig_width: 8
+    latex_engine: lualatex
+mainfont: Times New Roman
+header-includes:
+- \usepackage{setspace}
+- \doublespacing
+subtitle: Assignment Submission for Course CP8305 Instructed by Dr. Cherie Ding
+fontsize: 12pt
+---
+
+---
+references:
+- id: lichman2013
+  title: (UCI) Machine Learning Repository
+  author:
+  - family: Lichman
+    given: Moshe
+  URL: "http://archive.ics.uci.edu/ml"
+  note: "Accessed: 2017-04-11"
+  issued:
+    year: 2013
+  institution: "University of California, Irvine, School of Information and Computer Sciences"
+- id: sigkdd2016
+  title: KDD Cup Archives
+  author: 
+  - family: SIGKDD
+    given: ""
+  URL: "www.kdd.org/kdd-cup"
+  note: "Accessed: 2017-04-11"
+  issued:
+    year: 2013
+- id: kotzias2015
+  title: "From Group to Individual Labels Using Deep Features"
+  container-title: "Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining"
+  author:
+  - family: Kotzias
+    given: Dimitrios
+  - family: Denil
+    given: Misha
+  - family: Nando
+    given: "De Freitas"
+  - family: Smyth
+    given: Padhraic
+  URL: "http://dl.acm.org/citation.cfm?id=2783380"
+  DOI: "10.1145/2783258.2783380"
+  page: 597-606
+  type: article-journal
+  publisher: Association for Computing Machinery
+  issued:
+    year: 2015
+- id: prakash2011
+  title: "Natural language processing: an introduction"
+  container-title: "Journal of the American Medical Informatics Association"
+  author:
+  - family: Nadkarni
+    given: Prakash M
+  - family: Ohno-Machado
+    given: Lucila
+  - family: Chapman
+    given: Wendy W
+  DOI: "10.1136/amiajnl-2011-000464"
+  page: 544-551
+  type: article-journal
+  publisher: PubMed Central
+  issued:
+    year: 2011
+  volume: 18
+  issue: 5
+- id: borra2010
+  title: "Measuring the prediction error. A comparison of cross-validation, bootstrap and covariance penalty methods"
+  container-title: "Computational Statistics and Data Analysis"
+  author:
+  - family: Borra
+    given: Simone
+  - family: Di Ciaccio
+    given: Agostino
+  DOI: "10.1016/j.csda.2010.03.004"
+  page: 2876-2989
+  type: article-journal
+  publisher: Elsevier
+  issued:
+    year: 2010
+  volume: 54
+  issue: 12
+---
+
+```{r setup, include = FALSE}
+
+# (package_install) Required packages
+packages <- c("bookdown", "knitr", "text2vec")
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly=TRUE)) {
+    install.packages(pkg,
+                     dependencies=TRUE,
+                     repos="http://cran.rstudio.com/")
+  }
+}
+
+# (chunk_options) KnitR chunk options
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  results = "asis"
+)
+
+```
+
+\newpage
+
+# Objectives
+
+This assignment was provided by Dr. Cherie Ding for the CP8305 Knowledge Discovery course at Ryerson University. The purposes of the assignment was to:  
+
+1. Identify a practical dataset from the University of California, Irvine (UCI) Machine Learning Repository [@lichman2013] or Knowledge Discovery in Datases (KDD) Cup Archives [@sigkdd2016]  
+2. Identify a machine learning problem with the chosen dataset in (1)  
+3. Apply various machine learning algorithms to the problem in (2) to find algorithms that can solve (2) well and provide insight into the data in (1)
+
+# Data
+
+```{r raw, include=FALSE, cache=TRUE}
+
+# 1. Download the zipped SLS data from UCI into a temp dir
+temp <- tempdir()
+src <- paste0("http://archive.ics.uci.edu/ml/machine-learning-databases/",
+              "00331/sentiment%20labelled%20sentences.zip")
+zipped <- file.path(temp, basename(src))
+download.file(src, zipped)
+unzip(zipped, exdir=temp)
+
+# 2. Obtain SLS data paths from unzipped folder
+dsFolder <- file.path(temp, "sentiment labelled sentences")
+dsIgnore <- file.path(dsFolder, c(".DS_Store", "readme.txt"))
+dsFiles <- list.files(dsFolder, full.names=TRUE)
+dsFiles <- dsFiles[!dsFiles %in% dsIgnore]
+
+# 3. Obtain raw data
+raw <- list()
+for (p in dsFiles) {
+  raw[[basename(p)]] <- readLines(p)
+}
+rawInstances <- sum(sapply(raw, length))
+rawFiles <- paste0(names(raw), collapse=", ")
+rawPrevRows <- 5
+
+```
+
+The data chosen for this assignment was the Sentiment Labelled Sentences (SLS) Dataset donated on May 30, 2015 and downloaded from the UCI Machine Learning Repository [@kotzias2015]. There are `r length(raw)` text files (`r rawFiles`) with a combined total of `r rawInstances` instances, absent of missing values. Each file consists of 2 attributes with the first attribute being sentences from (string type) and the second being a binary class of either 0 for negative sentiment or 1 for positive sentiment (numeric type). The data in each file had attributes separated by a mixture of inconsistent spaces and tabs, and instances separated by rows. An example of the first `r rawPrevRows` rows are shown in Table \@ref(tab:tab1)^[In the table, (tab) indicates that a tab character was present in the data sample.]. Sentences were extracted by @kotzias2015 from [imdb.com](www.imdb.com), [amazon.com](www.amazon.com), and [yelp.com](www.yelp.com). These websites represent a movie database, online retailer, and a online business directory with crowd-sourced reviews, respectively. The SLS files are summarized in Table \@ref(tab:tab2)^[For clarification, a double indicates type numeric and a character indicates type string.].
+
+```{r tab1}
+knitr::kable(
+  data.frame(
+    Line = 1:rawPrevRows,
+    Sample = gsub("\t", " (tab) ", raw[[1]][1:rawPrevRows]),
+    stringsAsFactors = FALSE
+  ),
+  row.names = FALSE,
+  col.names = c("Line", "Sample"),
+  caption = paste("SLS Dataset Example for", strsplit(names(raw)[[1]], "_")[[1]][1], "Data")
+)
+```
+
+```{r tab2}
+knitr::kable(
+  data.frame(
+    File = names(raw),
+    Instances = sapply(raw, length),
+    Attributes = 2
+  ),
+  row.names = FALSE,
+  col.names = c("File", "Instances", "Attributes"),
+  caption = 'SLS Dataset Summary'
+)
+```
+
+# Problem
+
+The goal of the SLS dataset was to predict the values in attribute 2 (sentiment) which contain 0 or 1 for negative and positive sentiment respectively. The binary values of attribute 2 defined the SLS dataset as a classification problem. In order to predict sentiment, sentences from three different websites ([imdb.com](www.imdb.com), [amazon.com](www.amazon.com), and [yelp.com](www.yelp.com)) were given as the explanatory attribute 1. The text values of attribute 1 further defined the problem as a Natural Language Processing (NLP)^[NLP seeks to extract meaning from textual data involving language communication with low level tasks such as identification of individual words and high level tasks such as spelling correction [@prakash2011]] problem where the attribute values were unstructured, and required pre-processing before the machine could read and learn to model the SLS data. For simplicity, attribute 1 was referred to as the sentence attribute and attribute 2 was referred to as the sentiment attribute. The problem was then known as a classification problem for the sentiment attribute that required NLP of the sentence attribute. The following sections more formally define the problem framework.
+
+## Sentiment Attribute
+
+The sentiment attribute was the second attribute in the SLS dataset. It is the target vector $y^{(n)}$ containing binary values of either 0 or 1 given $n$ instances as seen in Equation \@ref(eq:eq1):
+
+\begin{equation}
+  y^{(n)} \in \{0, 1 \}
+(\#eq:eq1)
+\end{equation}
+
+## Sentence Attribute
+
+The sentence attribute was the first attribute in the SLS dataset. It is the raw text data $x^{(n)}$ given $n$ instances such that it contains $k$ number of words $w^{(k, n)}$ (separated by spaces^[For example, the text instance "hello goodbye now", contain 3 words "hello", "goodbye", and "now" that are separated by spaces]), where the word lengths^[Word lengths and text lengths are measured in the number of characters, excluding spaces and symbols that define punctuation, which are more specifically the number of alphanumeric characters in this case (e.g. the word "apple" has a length of 5 alphanumeric characters and the text "!*--" has a length of 0 characters containing non-alphanumeric characters)] $l_w$ of $w^{(k, n)}$ and $k$ are less than the length $l_x$ of the raw texts $x^{(n)}$ as seen in Equation \@ref(eq:eq2):
+
+\begin{equation}
+  w^{(k, n)} \in x^{(n)} \mid \enspace 0 < l_w^{(k)} \leq l_x^{(n)} \enspace and \enspace 0 < k \leq l_x^{(n)} 
+(\#eq:eq2)
+\end{equation}
+
+## Measures of Prediction Quality
+
+The classification problem given $x^{(n)}$ as the explanatory data and $y^{(n)}$ as the target classes was to obtain measurement values that define an algorithm to predict $y^{(n)}$ well. Measurement values were based on whether predicted classes $y_{pred}^{(n)}$ obtained using $x^{(n)}$ seen in Equation \@ref(eq:eq3): 
+
+\begin{equation}
+  \lim y_{pred}^{(n)} = f(x^{(n)})
+(\#eq:eq3)
+\end{equation}
+
+The classification prediction quality used measurements that were based on the $f_{eq}$ counts of $y_{pred}^{(n)}$ equal to $y^{(n)}$ given the total number of instances $N$ expressed in Equation \@ref(eq:eq4):
+
+\begin{equation}
+  f_{eq} = \sum_{n=1}^N y_{eq} \mid
+  y_{eq} =
+  \begin{cases}
+    1: & \text{if}\ y_{pred}^{(n)} = y^{(n)} \\
+    0: & \text{otherwise}
+  \end{cases}
+(\#eq:eq4)
+\end{equation}
+
+Accuracy measurements were defined as a maximization problem, where higher values are better and lower values are worse. Error measurements were defined as a minimization problem, where lower values are better and higher values are worse. An accuracy measurement $f_{acc}$ increases the more times $y_{pred}^{(n)}$ is equal to $y^{(n)}$ given $f_{eq}$ as seen in Equation \@ref(eq:eq5): 
+
+\begin{equation}
+  \lim_{f_{acc} \to +\infty} f_{acc} \enspace as \enspace f_{eq} \rightarrow +\infty \enspace \mid f_{acc} = f(y_{pred}^{(n)}, y^{(n)})
+(\#eq:eq5)
+\end{equation}
+
+An error measurement $f_{err}$ decreases the more times $y_{pred}^{(n)}$ is equal to $y^{(n)}$ given $f_{eq}$ as seen in \@ref(eq:eq6):
+
+\begin{equation}
+  \lim_{f_{err} \to -\infty} f_{acc} \enspace as \enspace f_{eq} \rightarrow +\infty \enspace \mid f_{err} = f(y_{pred}^{(n)}, y^{(n)})
+(\#eq:eq6)
+\end{equation}
+
+# Methods
+
+The methods described in this section attempt to produce a solution (known as the Best Attempt (BA) solution) to the classification problem defined in Section [3][Problem]. The unstructured nature of the sentence attribute presented required preprocessing to create features which are then further preprocessed to search for adequately useful features (selection). These features were then randomly split into approximately equal number of instances for cross validation training sets. These training sets were then used as input for a selected number of algorithms, which were optimized for algorithm specific parameters and evaluated for prediction quality. A summary of the methods is shown in Figure \@ref(fig:fig1). See Appendix [A][Appendix A: R Code] for the R code.
+
+```{r fig1, fig.cap="Flowchart of Methods"}
+knitr::include_graphics("img/fig1.png")
+```
+
+## Preprocessing
+
+The preprocessing steps involved getting the data ready for the machine learning algorithms to train on. This involved creating features from the instances in the sentence attribute and selecting only the features that are measured to be useful in terms of predicting the target sentiment attribute. Furthermore, the data was also split into cross validation training sets and used as the resulting training data for the machine learning algorithms.
+
+### Parsing
+
+The data was defined as a tab delimited text file that held string based text as the first sentence attribute and numeric binary numbers as the second sentiment attribute. The unstructured nature of the sentence attribute made parsing the file less straight-forward as instances in the sentence attribute were not quoted and could contain any number of tab characters. The data was: (i) parsed line by line (ii) cleaned by removing the last occurence of tab characters, and (iii) extracted for sentiment and sentence instances where the last character was defined as the sentiment, and the rest of the text was defined as the sentence.
+
+```{r parsing, cache=TRUE}
+
+# 1. Read the data on a line by line basis
+ds <- sapply(dsFiles, readLines)
+
+# 2. Extract sentence and sentiment attributes
+x <- c() # sentence attribute
+y <- c() # sentiment attribute
+for (n in ds) { # each instance n
+  lx <- nchar(n) # sentence length
+  xn <- substr(n, 1, lx - 2) # sentence instance
+  yn <- as.numeric(substr(n, lx - 1, lx)) # sentiment instance
+  x <- c(x, xn)
+  y <- c(y, yn)
+}
+dsParsed <- data.frame(sentence=x, sentiment=y, stringsAsFactors=FALSE)
+
+```
+
+### Features
+
+The features^[Features in this report are similar to attributes, except that features refer to the machine-constructed columns to differ from the original sentence and sentiment attributes] were created using a simple bag of words model that was not order-dependent. The bag of words model constructs a feature for each unique word in the sentence attribute and counts the occurence per sentence instance in the SLS dataset [@prakash2011]. Each $k$ word feature $w^{(n, k)}$ is a count of the occurence of $k$ unique words in the sentence attribute $x^{(n)}$ given $n$ instances. For clarification, all words were considered, including stop words^[Stop words are commonly used words in the language that are often, but not always, removed as they do may not hold useful information], as these would be removed in the feature selection process if they were measured as being not very useful - thus, the possibility of them being useful was considered. An example of the word features is given in Table \@ref(tab:tab3).
+
+```{r tab3}
+knitr::kable(
+  data.frame(
+    word1 = c(2, 5, 10),
+    word2 = c(5, 2, 10),
+    wordk = c(10, 5, 2)
+  ),
+  row.names = FALSE,
+  col.names = c("Word-1", "Word-2", "Word-k"),
+  caption = "Example of Word Features"
+)
+```
+
+```{r features, cache=TRUE}
+library(text2vec)
+xn <- dsParsed$sentence
+
+# 1. Obtain words wn for each xn using a tokenizer
+wn <- itoken(xn, tolower, word_tokenizer)
+
+# 2. Vocabulary of wk words for wn 
+wk <- vocab_vectorizer(create_vocabulary(wn))
+
+# 3. Obtain word features matrix wnk given n instances and k words
+wnk <- as.matrix(get_dtm(create_corpus(wn, wk)))
+
+```
+### Feature Selection
+
+
+
+### Cross Validation
+
+The data from the feature selection was split into a standard 10-fold cross validation scenario. In the 10-fold cross validation scenario, the data was randomly split into 10 equal parts, trained on a 9 parts, and tested on the 1 part not in the 9 training parts until all testing parts have been tested for [@borra2010].
+
+## Algorithms
+
+### Naive Bayes Classifier
+
+\newpage
+
+# Appendix A: R Code
+
+```{r appendix, eval=FALSE, echo=TRUE}
+
+# Dependencies ----
+
+# (package_install) Required packages and loading
+packages <- c("text2vec")
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly=TRUE)) {
+    install.packages(pkg,
+                     dependencies=TRUE,
+                     repos="http://cran.rstudio.com/")
+  }
+  library(pkg, character.only=TRUE)
+}
+
+# Data (See Section 2) ----
+
+# 1. Download the zipped SLS data from UCI into a temp dir
+temp <- tempdir()
+src <- paste0("http://archive.ics.uci.edu/ml/machine-learning-databases/",
+              "00331/sentiment%20labelled%20sentences.zip")
+zipped <- file.path(temp, basename(src))
+download.file(src, zipped)
+unzip(zipped, exdir=temp)
+
+# 2. Obtain SLS data paths from unzipped folder
+dsFolder <- file.path(temp, "sentiment labelled sentences")
+dsIgnore <- file.path(dsFolder, c(".DS_Store", "readme.txt"))
+dsFiles <- list.files(dsFolder, full.names=TRUE)
+dsFiles <- dsFiles[!dsFiles %in% dsIgnore]
+
+# Parsing (See Section 4.1.1) ----
+
+# 1. Read the data on a line by line basis
+ds <- sapply(dsFiles, readLines)
+
+# 2. Extract sentence and sentiment attributes
+x <- c() # sentence attribute
+y <- c() # sentiment attribute
+for (n in ds) { # each instance n
+  lx <- nchar(n) # sentence length
+  xn <- substr(n, 1, lx - 2) # sentence instance
+  yn <- as.numeric(substr(n, lx - 1, lx)) # sentiment instance
+  x <- c(x, xn)
+  y <- c(y, yn)
+}
+dsParsed <- data.frame(sentence=x, sentiment=y, stringsAsFactors=FALSE)
+
+# Features (See Section 4.1.2) ----
+
+# 1. Obtain words wn for each xn using a tokenizer
+xn <- dsParsed$sentence
+wn <- itoken(xn, tolower, word_tokenizer)
+
+# 2. Vocabulary of wk words for wn 
+wk <- vocab_vectorizer(create_vocabulary(wn))
+
+# 3. Obtain word features matrix wnk given n instances and k words
+wnk <- as.matrix(get_dtm(create_corpus(wn, wk)))
+
+```
+
+\newpage
+
+# References
