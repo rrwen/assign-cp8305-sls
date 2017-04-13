@@ -1,8 +1,8 @@
-# Natural Language Processing and Prediction of Sentiment Labelled Sentences
+# Experiments on Natural Language Processing and Prediction of Sentiment Labelled Sentences
 
 Richard Wen  
 rwen@ryerson.ca      
-April 12, 2017  
+April 13, 2017  
 Assignment for Course CP8305  
 Instructed by Dr. Cherie Ding  
 
