@@ -3,7 +3,7 @@
 # Setup ----
 
 # (package_install) Required packages
-packages <- c("DiagrammeR", "mlr")
+packages <- c("DiagrammeR")
 for (pkg in packages) {
   if (!requireNamespace(pkg, quietly=TRUE)) {
     install.packages(pkg,
@@ -53,8 +53,7 @@ paths$selection <- "cross_validation_sets"
 paths$cross_validation_sets <- "learners"
 
 # (graph_algorithms) Add algorithm paths
-paths$learners <- "optimization"
-paths$optimization <- "prediction_evaluation"
+paths$learners <- "prediction_evaluation"
 
 # (path_edges) Create flowchart edges
 pathKVEdges <- kvEdges(paths)

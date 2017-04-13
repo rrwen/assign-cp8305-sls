@@ -289,7 +289,7 @@ An error measurement $f_{err}$, where $C_{err}$ is a constant representing the w
 
 # Methods
 
-The methods described in this section attempted to experiment with several solutions to the classification problem defined in Section [3][Problem]. The unstructured nature of the sentence attribute presented required preprocessing to create features which are then further preprocessed to search for adequately useful features (selection). These features were then randomly split into approximately equal number of instances for cross validation training sets. These training sets were then used as input for a selected number of algorithms, which were optimized for algorithm specific parameters and evaluated for prediction quality. A summary of the methods is shown in Figure \@ref(fig:fig1). See Appendix [A][Appendix A: R Code] for the R code.
+The methods described in this section attempted to experiment with several solutions to the classification problem defined in Section [3][Problem]. The unstructured nature of the sentence attribute presented required preprocessing to create features which are then further preprocessed to search for adequately useful features (selection). These features were then randomly split into approximately equal number of instances for cross validation training sets. These training sets were then used as input for a selected number of algorithms and evaluated for prediction quality. A summary of the methods is shown in Figure \@ref(fig:fig1). See Appendix [A][Appendix A: R Code] for the R code.
 
 ```{r fig1, fig.cap="Flowchart of Methods"}
 knitr::include_graphics("img/fig1.png")
@@ -301,7 +301,11 @@ The preprocessing steps involved getting the data ready for the machine learning
 
 ### Parsing
 
-The data was defined as a tab delimited text file that held string based text as the first sentence attribute and numeric binary numbers as the second sentiment attribute. The unstructured nature of the sentence attribute made parsing the file less straight-forward as instances in the sentence attribute were not quoted and could contain any number of tab characters. The data was: (i) parsed line by line (ii) cleaned by removing the last occurence of tab characters and punctuation, and (iii) extracted for sentiment and sentence instances where the last character was defined as the sentiment, and the rest of the text was defined as the sentence.
+The data was defined as a tab delimited text file that held string based text as the first sentence attribute and numeric binary numbers as the second sentiment attribute. The unstructured nature of the sentence attribute made parsing the file less straight-forward as instances in the sentence attribute were not quoted and could contain any number of tab characters. The data was: 
+
+1. Parsed line by line
+2. Cleaned by removing the last occurence of tab characters and punctuation
+3. Extracted for sentiment and sentence instances where the last character was defined as the sentiment, and the rest of the text was defined as the sentence
 
 ```{r parsing}
 
@@ -325,7 +329,7 @@ ds <- data.frame(sentence=x, sentiment=y, stringsAsFactors=FALSE)
 
 ### Features
 
-The features^[Features in this report are similar to attributes, except that features refer to the machine-constructed columns to differ from the original sentence and sentiment attributes] were created using a simple bag of words model that was not order-dependent. The bag of words model constructs a feature for each unique word in the sentence attribute and counts the occurence per sentence instance in the SLS dataset [@prakash2011]. Each $k$ word feature $w^{(k)}$ is a count of the occurence of $k$ unique words in the sentence attribute $x^{(n)}$ given $n$ instances.  For clarification, all words were considered, including stop words[^Stop words are commonly used words in the language that are often, but not always, removed as they may not hold useful information, but there is a possiblity that stop words may be useful], as these would be removed in the feature selection process if they were measured as being not very useful - thus, the possibility of them being useful was considered. An example of the word features is given in Table \@ref(tab:tab3). Feature construction was applied using the *text2vec* R package [@selivanov2016].
+The features^[Features in this report are similar to attributes, except that features refer to the machine-constructed columns to differ from the original sentence and sentiment attributes] were created using a simple bag of words model. The bag of words model constructs a feature for each unique word in the sentence attribute and counts the occurence per sentence instance in the SLS dataset [@prakash2011]. Each $k$ word feature $w^{(k)}$ is a count of the occurence of $k$ unique words in the sentence attribute $x^{(n)}$ given $n$ instances.  For clarification, all words were considered, including stop words[^Stop words are commonly used words in the language that are often, but not always, removed as they may not hold useful information, but there is a possiblity that stop words may be useful], as these would be removed in the feature selection process if they were measured as being not very useful - thus, the possibility of them being useful was considered. An example of the word features is given in Table \@ref(tab:tab3). Feature construction was applied using the *text2vec* R package [@selivanov2016].
 
 ```{r tab3}
 knitr::kable(
@@ -482,7 +486,7 @@ resultsCombined <- c(results$svm, results$rf, results$nbc)
 
 # Results
 
-Figure \@ref(fig:fig2) shows the distribution of classes in the sentiment attribute. The results ranged from CV F1 scores of `r round(min(resultsCombined), 2)` to `r round(max(resultsCombined), 2)` per fold. Figure \@ref(fig:fig3) shows the average CV F1 scores obtained from the experiments. The word feature importances are also shown in Figure \@ref(fig:fi4). The top ten word features based on feature importances was selected from these options, which produced a training feature matrix of 10 columns by `r rawInstances` rows, with each $k$ column representing $w^{k}$ word vectors.
+Figure \@ref(fig:fig2) shows the distribution of classes in the sentiment attribute. The results ranged from CV F1 scores of `r round(min(resultsCombined), 2)` to `r round(max(resultsCombined), 2)` per fold. Figure \@ref(fig:fig3) shows the average CV F1 scores obtained from the experiments. The word feature importances are also shown in Figure \@ref(fig:fig4). The top ten word features based on feature importances was selected from these options, which produced a training feature matrix of 10 columns by `r rawInstances` rows, with each $k$ column representing $w^{k}$ word vectors.
 
 ```{r fig2, fig.cap="Sentiment Class Distribution"}
 barplot(
