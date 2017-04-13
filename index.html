@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Natural Language Processing and Prediction of Sentiment Labelled Sentences</title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <meta name="description" content="Natural Language Processing and Prediction of Sentiment Labelled Sentences">
+  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+
+  <meta property="og:title" content="Natural Language Processing and Prediction of Sentiment Labelled Sentences" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Natural Language Processing and Prediction of Sentiment Labelled Sentences" />
+  
+  
+  
+
+
+
+<meta name="date" content="2017-04-13">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+
+
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+</head>
+
+<body>
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path=""><a href="#objectives"><i class="fa fa-check"></i><b>1</b> Objectives</a></li>
+<li class="chapter" data-level="2" data-path=""><a href="#data"><i class="fa fa-check"></i><b>2</b> Data</a></li>
+<li class="chapter" data-level="3" data-path=""><a href="#problem"><i class="fa fa-check"></i><b>3</b> Problem</a><ul>
+<li class="chapter" data-level="3.1" data-path=""><a href="#sentiment-attribute"><i class="fa fa-check"></i><b>3.1</b> Sentiment Attribute</a></li>
+<li class="chapter" data-level="3.2" data-path=""><a href="#sentence-attribute"><i class="fa fa-check"></i><b>3.2</b> Sentence Attribute</a></li>
+<li class="chapter" data-level="3.3" data-path=""><a href="#measures-of-prediction-quality"><i class="fa fa-check"></i><b>3.3</b> Measures of Prediction Quality</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path=""><a href="#methods"><i class="fa fa-check"></i><b>4</b> Methods</a><ul>
+<li class="chapter" data-level="4.1" data-path=""><a href="#preprocessing"><i class="fa fa-check"></i><b>4.1</b> Preprocessing</a><ul>
+<li class="chapter" data-level="4.1.1" data-path=""><a href="#parsing"><i class="fa fa-check"></i><b>4.1.1</b> Parsing</a></li>
+<li class="chapter" data-level="4.1.2" data-path=""><a href="#features"><i class="fa fa-check"></i><b>4.1.2</b> Features</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path=""><a href="#algorithms"><i class="fa fa-check"></i><b>4.2</b> Algorithms</a><ul>
+<li class="chapter" data-level="4.2.1" data-path=""><a href="#feature-selection"><i class="fa fa-check"></i><b>4.2.1</b> Feature Selection</a></li>
+<li class="chapter" data-level="4.2.2" data-path=""><a href="#cross-validation"><i class="fa fa-check"></i><b>4.2.2</b> Cross Validation</a></li>
+<li class="chapter" data-level="4.2.3" data-path=""><a href="#selected-learners"><i class="fa fa-check"></i><b>4.2.3</b> Selected Learners</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path=""><a href="#results"><i class="fa fa-check"></i><b>5</b> Results</a></li>
+<li class="chapter" data-level="6" data-path=""><a href="#conclusion"><i class="fa fa-check"></i><b>6</b> Conclusion</a></li>
+<li class="chapter" data-level="7" data-path=""><a href="#references"><i class="fa fa-check"></i><b>7</b> References</a></li>
+<li class="chapter" data-level="8" data-path=""><a href="#appendix-a-r-code"><i class="fa fa-check"></i><b>8</b> Appendix A: R Code</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Natural Language Processing and Prediction of Sentiment Labelled Sentences</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Natural Language Processing and Prediction of Sentiment Labelled Sentences</h1>
+<h3 class="subtitle"><em>Assignment Submission for Course CP8305 Instructed by Dr. Cherie Ding</em></h3>
+<h4 class="author"><em><p>Richard Wen<br />
+Ryerson University</p></em></h4>
+<h4 class="date"><em>April 13, 2017</em></h4>
+</div>
+
+<div id="objectives" class="section level1">
+<h1><span class="header-section-number">1</span> Objectives</h1>
+<p>This assignment was provided by Dr. Cherie Ding for the CP8305 Knowledge Discovery course at Ryerson University. The purposes of the assignment was to:</p>
+<ol style="list-style-type: decimal">
+<li>Identify a practical dataset from the University of California, Irvine (UCI) Machine Learning Repository <span class="citation">(Lichman 2013)</span> or Knowledge Discovery in Datases (KDD) Cup Archives <span class="citation">(SIGKDD 2013)</span><br />
+</li>
+<li>Identify a machine learning problem with the chosen dataset in (1)<br />
+</li>
+<li>Apply various machine learning algorithms to the problem in (2) to find algorithms that can solve (2) well and provide insight into the data in (1)</li>
+</ol>
+</div>
+<div id="data" class="section level1">
+<h1><span class="header-section-number">2</span> Data</h1>
+<p>The data chosen for this assignment was the Sentiment Labelled Sentences (SLS) Dataset donated on May 30, 2015 and downloaded from the UCI Machine Learning Repository <span class="citation">(Kotzias et al. 2015)</span>. There are 3 text files (amazon_cells_labelled.txt, imdb_labelled.txt, yelp_labelled.txt) with a combined total of 3000 instances, absent of missing values. Each file consists of 2 attributes with the first attribute being sentences from (string type) and the second being a binary class of either 0 for negative sentiment or 1 for positive sentiment (numeric type). The data in each file had attributes separated by a mixture of inconsistent spaces and tabs, and instances separated by rows. An example of the first 5 rows are shown in Table <a href="#tab:tab1">2.1</a><a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Sentences were extracted by <span class="citation">Kotzias et al. (2015)</span> from <a href="www.imdb.com">imdb.com</a>, <a href="www.amazon.com">amazon.com</a>, and <a href="www.yelp.com">yelp.com</a>. These websites represent a movie database, online retailer, and a online business directory with crowd-sourced reviews, respectively. The SLS files are summarized in Table <a href="#tab:tab2">2.2</a><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>.</p>
+<table>
+<caption><span id="tab:tab1">Table 2.1: </span>SLS Dataset Example for amazon Data</caption>
+<thead>
+<tr class="header">
+<th align="right">Line</th>
+<th align="left">Sample</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">So there is no way for me to plug it in here in the US unless I go by a converter. (tab) 0</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">Good case, Excellent value. (tab) 1</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">Great for the jawbone. (tab) 1</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">Tied to charger for conversations lasting more than 45 minutes.MAJOR PROBLEMS!! (tab) 0</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">The mic is great. (tab) 1</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption><span id="tab:tab2">Table 2.2: </span>SLS Dataset Summary</caption>
+<thead>
+<tr class="header">
+<th align="left">File</th>
+<th align="right">Instances</th>
+<th align="right">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">amazon_cells_labelled.txt</td>
+<td align="right">1000</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">imdb_labelled.txt</td>
+<td align="right">1000</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">yelp_labelled.txt</td>
+<td align="right">1000</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="problem" class="section level1">
+<h1><span class="header-section-number">3</span> Problem</h1>
+<p>The goal of the SLS dataset was to predict the values in attribute 2 (sentiment) which contain 0 or 1 for negative and positive sentiment respectively. The binary values of attribute 2 defined the SLS dataset as a classification problem. In order to predict sentiment, sentences from three different websites (<a href="www.imdb.com">imdb.com</a>, <a href="www.amazon.com">amazon.com</a>, and <a href="www.yelp.com">yelp.com</a>) were given as the explanatory attribute 1. The text values of attribute 1 further defined the problem as a Natural Language Processing (NLP)<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> problem where the attribute values were unstructured, and required pre-processing before the machine could read and learn to model the SLS data. For simplicity, attribute 1 was referred to as the sentence attribute and attribute 2 was referred to as the sentiment attribute. The problem was then known as a classification problem for the sentiment attribute that required NLP of the sentence attribute. The following sections more formally define the problem framework.</p>
+<div id="sentiment-attribute" class="section level2">
+<h2><span class="header-section-number">3.1</span> Sentiment Attribute</h2>
+<p>The sentiment attribute was the second attribute in the SLS dataset. It is the target vector <span class="math inline">\(y^{(n)}\)</span> containing binary values of either 0 or 1 given <span class="math inline">\(n\)</span> instances as seen in Equation <a href="#eq:eq1">(3.1)</a>:</p>
+<span class="math display" id="eq:eq1">\[\begin{equation}
+  y^{(n)} \in \{0, 1 \}
+\tag{3.1}
+\end{equation}\]</span>
+</div>
+<div id="sentence-attribute" class="section level2">
+<h2><span class="header-section-number">3.2</span> Sentence Attribute</h2>
+<p>The sentence attribute was the first attribute in the SLS dataset. It is the raw text data <span class="math inline">\(x^{(n)}\)</span> given <span class="math inline">\(n\)</span> instances such that it contains <span class="math inline">\(k\)</span> number of words <span class="math inline">\(w^{(k, n)}\)</span> (separated by spaces<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>), where the word lengths<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> <span class="math inline">\(l_w\)</span> of <span class="math inline">\(w^{(k, n)}\)</span> and <span class="math inline">\(k\)</span> are less than the length <span class="math inline">\(l_x\)</span> of the raw texts <span class="math inline">\(x^{(n)}\)</span> as seen in Equation <a href="#eq:eq2">(3.2)</a>:</p>
+<span class="math display" id="eq:eq2">\[\begin{equation}
+  w^{(k, n)} \in x^{(n)} \mid \enspace 0 &lt; l_w^{(k)} \leq l_x^{(n)} \enspace and \enspace 0 &lt; k \leq l_x^{(n)} 
+\tag{3.2}
+\end{equation}\]</span>
+</div>
+<div id="measures-of-prediction-quality" class="section level2">
+<h2><span class="header-section-number">3.3</span> Measures of Prediction Quality</h2>
+<p>The classification problem given <span class="math inline">\(x^{(n)}\)</span> as the explanatory data and <span class="math inline">\(y^{(n)}\)</span> as the target classes was to obtain measurement values that define an algorithm to predict <span class="math inline">\(y^{(n)}\)</span> well. Measurement values were based on whether predicted classes <span class="math inline">\(y_{pred}^{(n)}\)</span> obtained using <span class="math inline">\(x^{(n)}\)</span> seen in Equation <a href="#eq:eq3">(3.3)</a>:</p>
+<span class="math display" id="eq:eq3">\[\begin{equation}
+  \lim y_{pred}^{(n)} = f(x^{(n)})
+\tag{3.3}
+\end{equation}\]</span>
+<p>The classification prediction quality used measurements that were based on the <span class="math inline">\(f_{eq}\)</span> counts of <span class="math inline">\(y_{pred}^{(n)}\)</span> that are equal to <span class="math inline">\(y^{(n)}\)</span> given the total number of instances <span class="math inline">\(N\)</span> expressed in Equation <a href="#eq:eq4">(3.4)</a>:</p>
+<span class="math display" id="eq:eq4">\[\begin{equation}
+  f_{eq} = \sum_{n=1}^N y_{eq} \mid
+  y_{eq} =
+  \begin{cases}
+    1: &amp; \text{if}\ y_{pred}^{(n)} = y^{(n)} \\
+    0: &amp; \text{otherwise}
+  \end{cases}
+\tag{3.4}
+\end{equation}\]</span>
+<p>Accuracy measurements were defined as a maximization problem, where higher values are better and lower values are worse. Error measurements were defined as a minimization problem, where lower values are better and higher values are worse.</p>
+<p>An accuracy measurement <span class="math inline">\(f_{acc}\)</span>, where <span class="math inline">\(C_{acc}\)</span> is a constant representing the best prediction quality, increases the more times <span class="math inline">\(y_{pred}^{(n)}\)</span> is equal to <span class="math inline">\(y^{(n)}\)</span> given <span class="math inline">\(f_{eq}\)</span> as seen in Equation <a href="#eq:eq5">(3.5)</a>:</p>
+<span class="math display" id="eq:eq5">\[\begin{equation}
+  \lim_{f_{acc} \to C_{acc}} f_{acc} \enspace as \enspace f_{eq} \rightarrow \infty \enspace \mid f_{acc} = f(y_{pred}^{(n)}, y^{(n)})
+\tag{3.5}
+\end{equation}\]</span>
+<p>An error measurement <span class="math inline">\(f_{err}\)</span>, where <span class="math inline">\(C_{err}\)</span> is a constant representing the worse prediction quality, decreases the more times <span class="math inline">\(y_{pred}^{(n)}\)</span> is equal to <span class="math inline">\(y^{(n)}\)</span> given <span class="math inline">\(f_{eq}\)</span> as seen in <a href="#eq:eq6">(3.6)</a>:</p>
+<span class="math display" id="eq:eq6">\[\begin{equation}
+  \lim_{f_{err} \to C_{err}} f_{acc} \enspace as \enspace f_{eq} \rightarrow \infty \enspace \mid f_{err} = f(y_{pred}^{(n)}, y^{(n)})
+\tag{3.6}
+\end{equation}\]</span>
+</div>
+</div>
+<div id="methods" class="section level1">
+<h1><span class="header-section-number">4</span> Methods</h1>
+<p>The methods described in this section attempt to produce a solution (known as the Best Attempt (BA) solution) to the classification problem defined in Section <a href="#problem">3</a>. The unstructured nature of the sentence attribute presented required preprocessing to create features which are then further preprocessed to search for adequately useful features (selection). These features were then randomly split into approximately equal number of instances for cross validation training sets. These training sets were then used as input for a selected number of algorithms, which were optimized for algorithm specific parameters and evaluated for prediction quality. A summary of the methods is shown in Figure <a href="#fig:fig1">4.1</a>. See Appendix <a href="#appendix-a-r-code">A</a> for the R code.</p>
+<div class="figure"><span id="fig:fig1"></span>
+<img src="img/fig1.png" alt="Flowchart of Methods" width="299" />
+<p class="caption">
+Figure 4.1: Flowchart of Methods
+</p>
+</div>
+<div id="preprocessing" class="section level2">
+<h2><span class="header-section-number">4.1</span> Preprocessing</h2>
+<p>The preprocessing steps involved getting the data ready for the machine learning algorithms to train on. This involved creating features from the instances in the sentence attribute and selecting only the features that are measured to be useful in terms of predicting the target sentiment attribute. Furthermore, the data was also split into cross validation training sets and used as the resulting training data for the machine learning algorithms.</p>
+<div id="parsing" class="section level3">
+<h3><span class="header-section-number">4.1.1</span> Parsing</h3>
+<p>The data was defined as a tab delimited text file that held string based text as the first sentence attribute and numeric binary numbers as the second sentiment attribute. The unstructured nature of the sentence attribute made parsing the file less straight-forward as instances in the sentence attribute were not quoted and could contain any number of tab characters. The data was: (i) parsed line by line (ii) cleaned by removing the last occurence of tab characters and punctuation, and (iii) extracted for sentiment and sentence instances where the last character was defined as the sentiment, and the rest of the text was defined as the sentence.</p>
+</div>
+<div id="features" class="section level3">
+<h3><span class="header-section-number">4.1.2</span> Features</h3>
+<p>The features<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> were created using a simple bag of words model that was not order-dependent. The bag of words model constructs a feature for each unique word in the sentence attribute and counts the occurence per sentence instance in the SLS dataset <span class="citation">(Nadkarni, Ohno-Machado, and Chapman 2011)</span>. Each <span class="math inline">\(k\)</span> word feature <span class="math inline">\(w^{(k)}\)</span> is a count of the occurence of <span class="math inline">\(k\)</span> unique words in the sentence attribute <span class="math inline">\(x^{(n)}\)</span> given <span class="math inline">\(n\)</span> instances. For clarification, all words were considered, including stop words[^Stop words are commonly used words in the language that are often, but not always, removed as they may not hold useful information, but there is a possiblity that stop words may be useful], as these would be removed in the feature selection process if they were measured as being not very useful - thus, the possibility of them being useful was considered. An example of the word features is given in Table <a href="#tab:tab3">4.1</a>. Feature construction was applied using the <em>text2vec</em> R package <span class="citation">(Selivanov 2016)</span>.</p>
+<table>
+<caption><span id="tab:tab3">Table 4.1: </span>Example of Word Features</caption>
+<thead>
+<tr class="header">
+<th align="right">Word-1</th>
+<th align="right">Word-2</th>
+<th align="right">Word-k</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="right">10</td>
+<td align="right">10</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="algorithms" class="section level2">
+<h2><span class="header-section-number">4.2</span> Algorithms</h2>
+<p>The algorithms applied to solve the classification problem in involved optimizing features and a measure of prediction quality based on training and testing on cross validation folds.</p>
+<div id="feature-selection" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Feature Selection</h3>
+<p>Feature selection was used to filter the word features <span class="math inline">\(w^{(k)}\)</span> for the most important word features. A measure of importance was defined by using the Random Forest (RF) algorithm. The RF algorithm ensembles multiple decision trees by randomly subsetting portions of the complete data to construct each tree <span class="citation">(Breiman 2001)</span>. For each portion of data subsetted, there were remaining portions that were used to calculate an Out Of Bag (OOB) error by using the constructed decison trees to predict on the remaining data portions. These remaining portions were referred to as the OOB samples, and were used in calculating the feature importances. Each <span class="math inline">\(k\)</span> word feature <span class="math inline">\(w^{(k)}\)</span> was then calculated for feature importances by randomly permuting prediction errors on the OOB samples, and comparing their differences on the between the permuted and un-permuted errors. These feature importances quantify the usefulness of word features for the classification problem, where higher values represent more useful features and lower values represent less useful features. Initially, features in which the occurence of the word is less than 0.1% of the total number of ocurrences were removed, followed by stricture feature removal of features that were even slightly correlated, where features with correlation values of greater than 0.05 were removed. This enabled independance assumptions to be better satisfied as there were an abundance of features. The feature selection then filtered for the top 10 features with the highest feature importance. The feature selection algorithm was applied using the <em>FSelector</em> and <em>caret</em> packages <span class="citation">(Kuhn 2016; romanski and Kotthoff 2016)</span>.</p>
+</div>
+<div id="cross-validation" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> Cross Validation</h3>
+<p>The data from the feature selection was split into a standard 10-fold cross validation scenario. In the 10-fold cross validation scenario, the data was randomly split into 10 equal parts, trained on 9 parts, and tested on the 1 part not in the 9 training parts until all testing parts have been tested for <span class="citation">(Borra and Di Ciaccio 2010)</span>. Cross validation enables prediction quality measures to evaluate the generalizability of algorithms as different parts ot the data are used to learn from and predict on. This generalizability quality more accurately represents real-world scenarios as there are often missing portions of data, and a complete dataset is often not available as data is continuously updated. Cross validation was also applied using the <em>caret</em> R package.</p>
+</div>
+<div id="selected-learners" class="section level3">
+<h3><span class="header-section-number">4.2.3</span> Selected Learners</h3>
+<p>The learners selected for the BA solution were standard machine learning choices that were relatively efficient and simple to run as the strict correlation removal procedure enabled independent features of low dimensionality. The selected machine learning algorithms are the Support Vector Machine (SVM) and Random Forest (RF) from the R package <em>e1071</em> <span class="citation">(meyer 2017)</span>. The selected algorithms were evaluated based on their F1 score to account for potential binary class imbalances in the sentient attribute. See Appendix A for more details.</p>
+</div>
+</div>
+</div>
+<div id="results" class="section level1">
+<h1><span class="header-section-number">5</span> Results</h1>
+<p>The results ranged from CV F1 scores of 0.16 to 0.7. The performance was relatively poor for both learners in the cross validation scenario. Figure <a href="#fig:fig2">5.1</a> shows the average CV F1 scores obtained from the experiments. The word feature importances are also shown in Figure <a href="#fig:fig3">5.2</a>. The top ten word features based on feature importances was selected from these options.</p>
+<div class="figure"><span id="fig:fig2"></span>
+<img src="index_files/figure-html/fig2-1.png" alt="Average F1 Scores" width="672" />
+<p class="caption">
+Figure 5.1: Average F1 Scores
+</p>
+</div>
+<div class="figure"><span id="fig:fig3"></span>
+<img src="index_files/figure-html/fig3-1.png" alt="Feature Importances" width="672" />
+<p class="caption">
+Figure 5.2: Feature Importances
+</p>
+</div>
+
+</div>
+<div id="conclusion" class="section level1">
+<h1><span class="header-section-number">6</span> Conclusion</h1>
+<p>Both the RF and SVM algorithms performed similarily. However, the random forest was useful in calculating feature importances used in the feature selection process to reduce the number of dimensions on the data, as well as quantify how much more important one word feature was compared to another word feature. In particular, the word features <em>love, nice, works, no,</em> and <em>worst</em> were very useful in classifying the sentiment attribute consisting of 0 or 1s indicating negative and positive respectively. Although, the RF and SVM performed rather poorly, the results were reasonable and interpretable to see what influences postive and negative sentiment without manually reviewing thousands of online reactions. The high dimensionality of the data after processing for the bag of words model made it difficult to obtain quick and efficient methods of feature reduction, however the abundance of features made it more flexible when arbitrary rules were imposed - such as the strict correlation values restriction imposed in the methods Section. Algorithms that can efficiently either utilize high dimensional data or reduce it, but still enable the results to be interpretable would be very useful in machine learning problems involving text.</p>
+
+</div>
+<div id="references" class="section level1">
+<h1><span class="header-section-number">7</span> References</h1>
+<div id="refs">
+<div id="ref-borra2010">
+<p>Borra, Simone, and Agostino Di Ciaccio. 2010. “Measuring the Prediction Error. A Comparison of Cross-Validation, Bootstrap and Covariance Penalty Methods.” <em>Computational Statistics and Data Analysis</em> 54 (12). Elsevier: 2876–2989. doi:<a href="https://doi.org/10.1016/j.csda.2010.03.004">10.1016/j.csda.2010.03.004</a>.</p>
+</div>
+<div id="ref-breiman2001">
+<p>Breiman, Leo. 2001. “Random Forests.” <em>Machine Learning</em> 45 (1). Springer: 5–32. doi:<a href="https://doi.org/10.1023/A:1010933404324">10.1023/A:1010933404324</a>.</p>
+</div>
+<div id="ref-kotzias2015">
+<p>Kotzias, Dimitrios, Misha Denil, De Freitas Nando, and Padhraic Smyth. 2015. “From Group to Individual Labels Using Deep Features.” <em>Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining</em>. Association for Computing Machinery, 597–606. doi:<a href="https://doi.org/10.1145/2783258.2783380">10.1145/2783258.2783380</a>.</p>
+</div>
+<div id="ref-kuhn2016">
+<p>Kuhn, Max. 2016. “Caret: Classification and Regression Training.” <em>Journal of Statistical Software</em> 28 (5): 1–5. <a href="https://CRAN.R-project.org/package=caret" class="uri">https://CRAN.R-project.org/package=caret</a>.</p>
+</div>
+<div id="ref-lichman2013">
+<p>Lichman, Moshe. 2013. “(UCI) Machine Learning Repository.” <a href="http://archive.ics.uci.edu/ml" class="uri">http://archive.ics.uci.edu/ml</a>.</p>
+</div>
+<div id="ref-meyer2017">
+<p>meyer, david. 2017. “E1071: Misc Functions of the Department of Statistics, Probability Theory Group (Formerly: E1071), TU Wien.” <a href="https://cran.r-project.org/package=e1071" class="uri">https://cran.r-project.org/package=e1071</a>.</p>
+</div>
+<div id="ref-prakash2011">
+<p>Nadkarni, Prakash M, Lucila Ohno-Machado, and Wendy W Chapman. 2011. “Natural Language Processing: An Introduction.” <em>Journal of the American Medical Informatics Association</em> 18 (5). PubMed Central: 544–51. doi:<a href="https://doi.org/10.1136/amiajnl-2011-000464">10.1136/amiajnl-2011-000464</a>.</p>
+</div>
+<div id="ref-romanski2016">
+<p>romanski, Piotr, and Lars Kotthoff. 2016. “FSelector: Selecting Attributes.” <a href="https://CRAN.R-project.org/package=FSelector" class="uri">https://CRAN.R-project.org/package=FSelector</a>.</p>
+</div>
+<div id="ref-selivanov2016">
+<p>Selivanov, Dmitriy. 2016. “Text2vec: Modern Text Mining Framework for R.” <a href="https://cran.r-project.org/package=text2vec" class="uri">https://cran.r-project.org/package=text2vec</a>.</p>
+</div>
+<div id="ref-sigkdd2016">
+<p>SIGKDD. 2013. “KDD Cup Archives.” <a href="www.kdd.org/kdd-cup" class="uri">www.kdd.org/kdd-cup</a>.</p>
+</div>
+</div>
+
+</div>
+<div id="appendix-a-r-code" class="section level1">
+<h1><span class="header-section-number">8</span> Appendix A: R Code</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Dependencies ----</span>
+
+<span class="co"># (package_install) Required packages and loading</span>
+packages &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;text2vec&quot;</span>, <span class="st">&quot;caret&quot;</span>, <span class="st">&quot;FSelector&quot;</span>, <span class="st">&quot;e1071&quot;</span>)
+for (pkg in packages) {
+  if (!<span class="kw">requireNamespace</span>(pkg, <span class="dt">quietly=</span><span class="ot">TRUE</span>)) {
+    <span class="kw">install.packages</span>(pkg,
+                     <span class="dt">dependencies=</span><span class="ot">TRUE</span>,
+                     <span class="dt">repos=</span><span class="st">&quot;http://cran.rstudio.com/&quot;</span>)
+  }
+  <span class="kw">library</span>(pkg, <span class="dt">character.only=</span><span class="ot">TRUE</span>)
+}
+
+<span class="co"># Data (See Section 2) ----</span>
+
+<span class="co"># 1. Download the zipped SLS data from UCI into a temp dir</span>
+temp &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
+src &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;http://archive.ics.uci.edu/ml/machine-learning-databases/&quot;</span>,
+              <span class="st">&quot;00331/sentiment%20labelled%20sentences.zip&quot;</span>)
+zipped &lt;-<span class="st"> </span><span class="kw">file.path</span>(temp, <span class="kw">basename</span>(src))
+<span class="kw">download.file</span>(src, zipped)
+<span class="kw">unzip</span>(zipped, <span class="dt">exdir=</span>temp)
+
+<span class="co"># 2. Obtain SLS data paths from unzipped folder</span>
+slsFolder &lt;-<span class="st"> </span><span class="kw">file.path</span>(temp, <span class="st">&quot;sentiment labelled sentences&quot;</span>)
+slsIgnore &lt;-<span class="st"> </span><span class="kw">file.path</span>(slsFolder, <span class="kw">c</span>(<span class="st">&quot;.DS_Store&quot;</span>, <span class="st">&quot;readme.txt&quot;</span>))
+slsFiles &lt;-<span class="st"> </span><span class="kw">list.files</span>(slsFolder, <span class="dt">full.names=</span><span class="ot">TRUE</span>)
+slsFiles &lt;-<span class="st"> </span>slsFiles[!slsFiles %in%<span class="st"> </span>slsIgnore]
+
+<span class="co"># Parsing (See Section 4.1.1) ----</span>
+
+<span class="co"># 1. Read the data on a line by line basis</span>
+sls &lt;-<span class="st"> </span><span class="kw">sapply</span>(slsFiles, readLines)
+
+<span class="co"># 2. Extract sentence and sentiment attributes</span>
+x &lt;-<span class="st"> </span><span class="kw">c</span>() <span class="co"># sentence attribute</span>
+y &lt;-<span class="st"> </span><span class="kw">c</span>() <span class="co"># sentiment attribute</span>
+for (n in sls) { <span class="co"># each instance n</span>
+  lx &lt;-<span class="st"> </span><span class="kw">nchar</span>(n) <span class="co"># sentence length</span>
+  xn &lt;-<span class="st"> </span><span class="kw">substr</span>(n, <span class="dv">1</span>, lx -<span class="st"> </span><span class="dv">2</span>) <span class="co"># sentence instance</span>
+  xn &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[[:punct:] ]+&#39;</span>,<span class="st">&#39; &#39;</span>, xn) <span class="co"># remove punctuation</span>
+  yn &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">substr</span>(n, lx -<span class="st"> </span><span class="dv">1</span>, lx)) <span class="co"># sentiment instance</span>
+  x &lt;-<span class="st"> </span><span class="kw">c</span>(x, xn)
+  y &lt;-<span class="st"> </span><span class="kw">c</span>(y, yn)
+}
+ds &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">sentence=</span>x, <span class="dt">sentiment=</span>y, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)
+
+<span class="co"># Features (See Section 4.1.2) ----</span>
+
+<span class="co"># 0. Define variables</span>
+xn &lt;-<span class="st"> </span>ds$sentence
+yn &lt;-<span class="st"> </span>ds$sentiment
+
+<span class="co"># 1. Obtain words wn for each xn using a tokenizer</span>
+wn &lt;-<span class="st"> </span><span class="kw">itoken</span>(xn, tolower, word_tokenizer)
+
+<span class="co"># 2. Vocabulary of wk words for wn </span>
+wk &lt;-<span class="st"> </span><span class="kw">vocab_vectorizer</span>(<span class="kw">create_vocabulary</span>(wn))
+
+<span class="co"># 3. Obtain word features matrix wnk given n instances and k words</span>
+wnk &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">get_dtm</span>(<span class="kw">create_corpus</span>(wn, wk)))
+
+<span class="co"># Selection (See Section 4.2.1) ----</span>
+
+<span class="co"># 1. Keep only words that occur more than 0.1% of occurences</span>
+freqc &lt;-<span class="st"> </span><span class="kw">apply</span>(wnk, <span class="dv">2</span>, sum)
+wnk &lt;-<span class="st"> </span>wnk[, <span class="kw">which</span>(freqc &gt;<span class="st"> </span><span class="kw">sum</span>(freqc) *<span class="st"> </span><span class="fl">0.001</span>)]
+
+<span class="co"># 2. Remove highly correlated features over 0.05</span>
+wcor &lt;-<span class="st"> </span><span class="kw">findCorrelation</span>(<span class="kw">cor</span>(wnk), <span class="dt">cutoff =</span> <span class="fl">0.05</span>)
+wnk &lt;-<span class="st"> </span>wnk[, -wcor]
+
+<span class="co"># 4. Calculate RF feature importances and select top 10</span>
+impw &lt;-<span class="st"> </span><span class="kw">random.forest.importance</span>(yn ~<span class="st"> </span>., <span class="kw">data.frame</span>(wnk, yn))
+top10 &lt;-<span class="st"> </span><span class="kw">cutoff.k</span>(impw, <span class="dv">10</span>)
+top10 &lt;-<span class="st"> </span>top10[top10 %in%<span class="st"> </span><span class="kw">colnames</span>(wnk)]
+wnk &lt;-<span class="st"> </span>wnk[, top10]
+
+<span class="co"># Cross Validation (See Section 4.2.2) ----</span>
+
+<span class="co"># Each element are the row ids of a 10 fold CV</span>
+cv &lt;-<span class="st"> </span><span class="kw">createFolds</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(wnk),
+                  <span class="dt">k =</span> <span class="dv">10</span>,
+                  <span class="dt">list =</span> <span class="ot">TRUE</span>,
+                  <span class="dt">returnTrain =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># Learners (See Section 4.2.3) ----</span>
+
+<span class="co"># 1. Set algorithms dependencies</span>
+randomForest &lt;-<span class="st"> </span>randomForest::randomForest
+
+<span class="co"># 2. Results list to collect Predictions</span>
+results &lt;-<span class="st"> </span><span class="kw">list</span>(
+  <span class="dt">svm =</span> <span class="kw">c</span>(),
+  <span class="dt">rf =</span> <span class="kw">c</span>()
+)
+
+<span class="co"># 3. Predict on 10 fold CV</span>
+yn &lt;-<span class="st"> </span><span class="kw">as.factor</span>(yn)
+for (ids in cv) {
+  
+  <span class="co"># 3.1 Training data</span>
+  xtrain &lt;-<span class="st"> </span>wnk[ids, ]
+  ytrain &lt;-<span class="st"> </span>yn[ids]
+  
+  <span class="co"># 3.2 Testing data</span>
+  xtest &lt;-<span class="st"> </span>wnk[-ids, ]
+  ytest &lt;-<span class="st"> </span>yn[-ids]
+  
+  <span class="co"># 3.3 Create models</span>
+  svmModel &lt;-<span class="st"> </span><span class="kw">svm</span>(<span class="dt">x=</span>xtrain, <span class="dt">y=</span>ytrain, <span class="dt">kernel =</span> <span class="st">&quot;linear&quot;</span>)
+  rfModel &lt;-<span class="st"> </span><span class="kw">randomForest</span>(<span class="dt">x=</span>xtrain, <span class="dt">y=</span>ytrain, <span class="dt">ntrees =</span> <span class="dv">500</span>)
+  
+  <span class="co"># 3.3 Predictions</span>
+  svmPredict &lt;-<span class="st"> </span><span class="kw">predict</span>(svmModel, xtest)
+  rfPredict &lt;-<span class="st"> </span><span class="kw">predict</span>(rfModel, xtest)
+  
+  <span class="co"># 3.4 Evaluate Precision</span>
+  svmPrecision &lt;-<span class="st"> </span><span class="kw">precision</span>(svmPredict, ytest)
+  rfPrecision &lt;-<span class="st"> </span><span class="kw">precision</span>(rfPredict, ytest)
+  
+  <span class="co"># 3.5 Evaluate Recall</span>
+  svmRecall &lt;-<span class="st"> </span><span class="kw">recall</span>(svmPredict, ytest)
+  rfRecall &lt;-<span class="st"> </span><span class="kw">recall</span>(rfPredict, ytest)
+  
+  <span class="co"># 3.6 Evaluate F1 Score</span>
+  svmF1 &lt;-<span class="st"> </span>(<span class="dv">2</span> *<span class="st"> </span>svmPrecision *<span class="st"> </span>svmRecall) /<span class="st"> </span>(svmPrecision +<span class="st"> </span>svmRecall)
+  rfF1 &lt;-<span class="st"> </span>(<span class="dv">2</span> *<span class="st"> </span>rfPrecision *<span class="st"> </span>rfRecall) /<span class="st"> </span>(rfPrecision +<span class="st"> </span>rfRecall)
+  
+  <span class="co"># 3.7 Add to results</span>
+  results$svm &lt;-<span class="st"> </span><span class="kw">c</span>(results$svm, svmF1)
+  results$rf &lt;-<span class="st"> </span><span class="kw">c</span>(results$rf, rfF1)
+}
+
+<span class="co"># 4. Aggregate results</span>
+resultMeans &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">mean</span>(results$svm), <span class="kw">mean</span>(results$rf))
+resultsCombined &lt;-<span class="st"> </span><span class="kw">c</span>(results$svm, results$rf)</code></pre></div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>In the table, (tab) indicates that a tab character was present in the data sample.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>For clarification, a double indicates type numeric and a character indicates type string.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>NLP seeks to extract meaning from textual data involving language communication with low level tasks such as identification of individual words and high level tasks such as spelling correction <span class="citation">(Nadkarni, Ohno-Machado, and Chapman 2011)</span><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>For example, the text instance “hello goodbye now”, contain 3 words “hello”, “goodbye”, and “now” that are separated by spaces<a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>Word lengths and text lengths are measured in the number of characters, excluding spaces and symbols that define punctuation, which are more specifically the number of alphanumeric characters in this case (e.g. the word “apple” has a length of 5 alphanumeric characters and the text “!*–&quot; has a length of 0 characters containing non-alphanumeric characters)<a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>Features in this report are similar to attributes, except that features refer to the machine-constructed columns to differ from the original sentence and sentiment attributes<a href="#fnref6">↩</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+
+
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+},
+"search": false
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
