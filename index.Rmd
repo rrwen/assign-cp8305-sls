@@ -3,13 +3,13 @@ title: "Natural Language Processing and Prediction of Sentiment Labelled Sentenc
 author: |
   | Richard Wen
   | Ryerson University
-date: "April 12, 2017"
+date: "April 13, 2017"
 output:
   bookdown::gitbook:
     split_by: none
   bookdown::pdf_document2:
     fig_caption: yes
-    fig_height: 2
+    fig_height: 6
     fig_width: 8
     latex_engine: lualatex
 mainfont: Times New Roman
@@ -94,12 +94,66 @@ references:
     year: 2010
   volume: 54
   issue: 12
+- id: breiman2001
+  title: "Random Forests"
+  container-title: "Machine Learning"
+  author:
+  - family: Breiman
+    given: Leo
+  DOI: "10.1023/A:1010933404324"
+  page: 5-32
+  type: article-journal
+  publisher: Springer
+  issued:
+    year: 2001
+  volume: 45
+  issue: 1
+- id: selivanov2016
+  title: "text2vec: Modern Text Mining Framework for R"
+  author:
+  - family: Selivanov
+    given: Dmitriy
+  URL: "https://cran.r-project.org/package=text2vec"
+  issued:
+    year: 2016
+- id: kuhn2016
+  title: "caret: Classification and Regression Training"
+  container-title: "Journal of Statistical Software"
+  author:
+  - family: Kuhn
+    given: Max
+  type: article-journal
+  URL: "https://CRAN.R-project.org/package=caret"
+  page: 1-5
+  issued:
+    year: 2016
+  volume: 28
+  issue: 5
+- id: romanski2016
+  title: "FSelector: Selecting Attributes"
+  author:
+  - family: romanski
+    given: Piotr
+  - family: Kotthoff
+    given: Lars
+  URL: "https://CRAN.R-project.org/package=FSelector "
+  page: 1-5
+  issued:
+    year: 2016
+- id: meyer2017
+  title: "e1071: Misc Functions of the Department of Statistics, Probability Theory Group (Formerly: E1071), TU Wien"
+  author:
+  - family: meyer
+    given: david
+  URL: "https://cran.r-project.org/package=e1071"
+  issued:
+    year: 2017
 ---
 
 ```{r setup, include = FALSE}
 
 # (package_install) Required packages
-packages <- c("bookdown", "knitr", "text2vec")
+packages <- c("bookdown", "knitr", "text2vec", "caret", "e1071")
 for (pkg in packages) {
   if (!requireNamespace(pkg, quietly=TRUE)) {
     install.packages(pkg,
@@ -130,7 +184,7 @@ This assignment was provided by Dr. Cherie Ding for the CP8305 Knowledge Discove
 
 # Data
 
-```{r raw, include=FALSE, cache=TRUE}
+```{r raw, include=FALSE}
 
 # 1. Download the zipped SLS data from UCI into a temp dir
 temp <- tempdir()
@@ -141,14 +195,14 @@ download.file(src, zipped)
 unzip(zipped, exdir=temp)
 
 # 2. Obtain SLS data paths from unzipped folder
-dsFolder <- file.path(temp, "sentiment labelled sentences")
-dsIgnore <- file.path(dsFolder, c(".DS_Store", "readme.txt"))
-dsFiles <- list.files(dsFolder, full.names=TRUE)
-dsFiles <- dsFiles[!dsFiles %in% dsIgnore]
+slsFolder <- file.path(temp, "sentiment labelled sentences")
+slsIgnore <- file.path(slsFolder, c(".DS_Store", "readme.txt"))
+slsFiles <- list.files(slsFolder, full.names=TRUE)
+slsFiles <- slsFiles[!slsFiles %in% slsIgnore]
 
 # 3. Obtain raw data
 raw <- list()
-for (p in dsFiles) {
+for (p in slsFiles) {
   raw[[basename(p)]] <- readLines(p)
 }
 rawInstances <- sum(sapply(raw, length))
@@ -216,7 +270,7 @@ The classification problem given $x^{(n)}$ as the explanatory data and $y^{(n)}$
 (\#eq:eq3)
 \end{equation}
 
-The classification prediction quality used measurements that were based on the $f_{eq}$ counts of $y_{pred}^{(n)}$ equal to $y^{(n)}$ given the total number of instances $N$ expressed in Equation \@ref(eq:eq4):
+The classification prediction quality used measurements that were based on the $f_{eq}$ counts of $y_{pred}^{(n)}$ that are equal to $y^{(n)}$ given the total number of instances $N$ expressed in Equation \@ref(eq:eq4):
 
 \begin{equation}
   f_{eq} = \sum_{n=1}^N y_{eq} \mid
@@ -228,17 +282,19 @@ The classification prediction quality used measurements that were based on the $
 (\#eq:eq4)
 \end{equation}
 
-Accuracy measurements were defined as a maximization problem, where higher values are better and lower values are worse. Error measurements were defined as a minimization problem, where lower values are better and higher values are worse. An accuracy measurement $f_{acc}$ increases the more times $y_{pred}^{(n)}$ is equal to $y^{(n)}$ given $f_{eq}$ as seen in Equation \@ref(eq:eq5): 
+Accuracy measurements were defined as a maximization problem, where higher values are better and lower values are worse. Error measurements were defined as a minimization problem, where lower values are better and higher values are worse.  
+
+An accuracy measurement $f_{acc}$, where $C_{acc}$ is a constant representing the best prediction quality, increases the more times $y_{pred}^{(n)}$ is equal to $y^{(n)}$ given $f_{eq}$ as seen in Equation \@ref(eq:eq5): 
 
 \begin{equation}
-  \lim_{f_{acc} \to +\infty} f_{acc} \enspace as \enspace f_{eq} \rightarrow +\infty \enspace \mid f_{acc} = f(y_{pred}^{(n)}, y^{(n)})
+  \lim_{f_{acc} \to C_{acc}} f_{acc} \enspace as \enspace f_{eq} \rightarrow \infty \enspace \mid f_{acc} = f(y_{pred}^{(n)}, y^{(n)})
 (\#eq:eq5)
 \end{equation}
 
-An error measurement $f_{err}$ decreases the more times $y_{pred}^{(n)}$ is equal to $y^{(n)}$ given $f_{eq}$ as seen in \@ref(eq:eq6):
+An error measurement $f_{err}$, where $C_{err}$ is a constant representing the worse prediction quality, decreases the more times $y_{pred}^{(n)}$ is equal to $y^{(n)}$ given $f_{eq}$ as seen in \@ref(eq:eq6):
 
 \begin{equation}
-  \lim_{f_{err} \to -\infty} f_{acc} \enspace as \enspace f_{eq} \rightarrow +\infty \enspace \mid f_{err} = f(y_{pred}^{(n)}, y^{(n)})
+  \lim_{f_{err} \to C_{err}} f_{acc} \enspace as \enspace f_{eq} \rightarrow \infty \enspace \mid f_{err} = f(y_{pred}^{(n)}, y^{(n)})
 (\#eq:eq6)
 \end{equation}
 
@@ -256,30 +312,31 @@ The preprocessing steps involved getting the data ready for the machine learning
 
 ### Parsing
 
-The data was defined as a tab delimited text file that held string based text as the first sentence attribute and numeric binary numbers as the second sentiment attribute. The unstructured nature of the sentence attribute made parsing the file less straight-forward as instances in the sentence attribute were not quoted and could contain any number of tab characters. The data was: (i) parsed line by line (ii) cleaned by removing the last occurence of tab characters, and (iii) extracted for sentiment and sentence instances where the last character was defined as the sentiment, and the rest of the text was defined as the sentence.
+The data was defined as a tab delimited text file that held string based text as the first sentence attribute and numeric binary numbers as the second sentiment attribute. The unstructured nature of the sentence attribute made parsing the file less straight-forward as instances in the sentence attribute were not quoted and could contain any number of tab characters. The data was: (i) parsed line by line (ii) cleaned by removing the last occurence of tab characters and punctuation, and (iii) extracted for sentiment and sentence instances where the last character was defined as the sentiment, and the rest of the text was defined as the sentence.
 
-```{r parsing, cache=TRUE}
+```{r parsing}
 
 # 1. Read the data on a line by line basis
-ds <- sapply(dsFiles, readLines)
+sls <- sapply(slsFiles, readLines)
 
 # 2. Extract sentence and sentiment attributes
 x <- c() # sentence attribute
 y <- c() # sentiment attribute
-for (n in ds) { # each instance n
+for (n in sls) { # each instance n
   lx <- nchar(n) # sentence length
   xn <- substr(n, 1, lx - 2) # sentence instance
+  xn <- gsub('[[:punct:] ]+',' ', xn) # remove punctuation
   yn <- as.numeric(substr(n, lx - 1, lx)) # sentiment instance
   x <- c(x, xn)
   y <- c(y, yn)
 }
-dsParsed <- data.frame(sentence=x, sentiment=y, stringsAsFactors=FALSE)
+ds <- data.frame(sentence=x, sentiment=y, stringsAsFactors=FALSE)
 
 ```
 
 ### Features
 
-The features^[Features in this report are similar to attributes, except that features refer to the machine-constructed columns to differ from the original sentence and sentiment attributes] were created using a simple bag of words model that was not order-dependent. The bag of words model constructs a feature for each unique word in the sentence attribute and counts the occurence per sentence instance in the SLS dataset [@prakash2011]. Each $k$ word feature $w^{(n, k)}$ is a count of the occurence of $k$ unique words in the sentence attribute $x^{(n)}$ given $n$ instances. For clarification, all words were considered, including stop words^[Stop words are commonly used words in the language that are often, but not always, removed as they do may not hold useful information], as these would be removed in the feature selection process if they were measured as being not very useful - thus, the possibility of them being useful was considered. An example of the word features is given in Table \@ref(tab:tab3).
+The features^[Features in this report are similar to attributes, except that features refer to the machine-constructed columns to differ from the original sentence and sentiment attributes] were created using a simple bag of words model that was not order-dependent. The bag of words model constructs a feature for each unique word in the sentence attribute and counts the occurence per sentence instance in the SLS dataset [@prakash2011]. Each $k$ word feature $w^{(k)}$ is a count of the occurence of $k$ unique words in the sentence attribute $x^{(n)}$ given $n$ instances.  For clarification, all words were considered, including stop words[^Stop words are commonly used words in the language that are often, but not always, removed as they may not hold useful information, but there is a possiblity that stop words may be useful], as these would be removed in the feature selection process if they were measured as being not very useful - thus, the possibility of them being useful was considered. An example of the word features is given in Table \@ref(tab:tab3). Feature construction was applied using the *text2vec* R package [@selivanov2016].
 
 ```{r tab3}
 knitr::kable(
@@ -295,8 +352,10 @@ knitr::kable(
 ```
 
 ```{r features, cache=TRUE}
+
 library(text2vec)
-xn <- dsParsed$sentence
+xn <- ds$sentence
+yn <- ds$sentiment
 
 # 1. Obtain words wn for each xn using a tokenizer
 wn <- itoken(xn, tolower, word_tokenizer)
@@ -308,17 +367,134 @@ wk <- vocab_vectorizer(create_vocabulary(wn))
 wnk <- as.matrix(get_dtm(create_corpus(wn, wk)))
 
 ```
-### Feature Selection
-
-
-
-### Cross Validation
-
-The data from the feature selection was split into a standard 10-fold cross validation scenario. In the 10-fold cross validation scenario, the data was randomly split into 10 equal parts, trained on a 9 parts, and tested on the 1 part not in the 9 training parts until all testing parts have been tested for [@borra2010].
 
 ## Algorithms
 
-### Naive Bayes Classifier
+The algorithms applied to solve the classification problem in involved optimizing features and a measure of prediction quality based on training and testing on cross validation folds.
+
+### Feature Selection
+
+Feature selection was used to filter the word features $w^{(k)}$ for the most important word features. A measure of importance was defined by using the Random Forest (RF) algorithm. The RF algorithm ensembles multiple decision trees by randomly subsetting portions of the complete data to construct each tree [@breiman2001]. For each portion of data subsetted, there were remaining portions that were used to calculate an Out Of Bag (OOB) error by using the constructed decison trees to predict on the remaining data portions. These remaining portions were referred to as the OOB samples, and were used in calculating the feature importances. Each $k$ word feature $w^{(k)}$ was then calculated for feature importances by randomly permuting prediction errors on the OOB samples, and comparing their differences on the between the permuted and un-permuted errors. These feature importances quantify the usefulness of word features for the classification problem, where higher values represent more useful features and lower values represent less useful features. Initially, features in which the occurence of the word is less than 0.1% of the total number of ocurrences were removed, followed by stricture feature removal of features that were even slightly correlated, where features with correlation values of greater than 0.05 were removed. This enabled independance assumptions to be better satisfied as there were an abundance of features. The feature selection then filtered for the top 10 features with the highest feature importance. The feature selection algorithm was applied using the *FSelector* and *caret* packages [@kuhn2016;@romanski2016].
+
+```{r selection, cache=TRUE}
+
+library(caret)
+library(FSelector)
+
+# 1. Keep only words that occur more than 0.1% of occurences
+freqc <- apply(wnk, 2, sum)
+wnk <- wnk[, which(freqc > sum(freqc) * 0.001)]
+
+# 2. Remove highly correlated features over 0.05
+wcor <- findCorrelation(cor(wnk), cutoff = 0.05)
+wnk <- wnk[, -wcor]
+
+# 4. Calculate RF feature importances and select top 10
+impw <- random.forest.importance(yn ~ ., data.frame(wnk, yn))
+top10 <- cutoff.k(impw, 10)
+top10 <- top10[top10 %in% colnames(wnk)]
+wnk <- wnk[, top10]
+
+```
+
+### Cross Validation
+
+The data from the feature selection was split into a standard 10-fold cross validation scenario. In the 10-fold cross validation scenario, the data was randomly split into 10 equal parts, trained on 9 parts, and tested on the 1 part not in the 9 training parts until all testing parts have been tested for [@borra2010]. Cross validation enables prediction quality measures to evaluate the generalizability of algorithms as different parts ot the data are used to learn from and predict on. This generalizability quality more accurately represents real-world scenarios as there are often missing portions of data, and a complete dataset is often not available as data is continuously updated. Cross validation was also applied using the *caret* R package.
+
+```{r cv}
+
+# Each element are the row ids of a 10 fold CV
+cv <- caret::createFolds(1:nrow(wnk),
+                         k = 10,
+                         list = TRUE,
+                         returnTrain = TRUE)
+
+```
+
+### Selected Learners
+
+The learners selected for the BA solution were standard machine learning choices that were relatively efficient and simple to run as the strict correlation removal procedure enabled independent features of low dimensionality. The selected machine learning algorithms are the Support Vector Machine (SVM) and Random Forest (RF) from the R package *e1071* [@meyer2017]. The selected algorithms were evaluated based on their F1 score to account for potential binary class imbalances in the sentient attribute. See Appendix A for more details.
+
+```{r methods, cache=TRUE}
+library(e1071)
+
+# 1. Set algorithms dependencies
+randomForest <- randomForest::randomForest
+precision <- caret::precision
+recall <- caret::recall
+
+# 2. Results list to collect Predictions
+results <- list(
+  svm = c(),
+  rf = c()
+)
+
+# 3. Predict on 10 fold CV
+yn <- as.factor(yn)
+for (ids in cv) {
+  
+  # 3.1 Training data
+  xtrain <- wnk[ids, ]
+  ytrain <- yn[ids]
+  
+  # 3.2 Testing data
+  xtest <- wnk[-ids, ]
+  ytest <- yn[-ids]
+  
+  # 3.3 Create models
+  svmModel <- svm(x=xtrain, y=ytrain, kernel = "linear")
+  rfModel <- randomForest(x=xtrain, y=ytrain, ntrees = 500)
+  
+  # 3.3 Predictions
+  svmPredict <- predict(svmModel, xtest)
+  rfPredict <- predict(rfModel, xtest)
+  
+  # 3.4 Evaluate Precision
+  svmPrecision <- precision(svmPredict, ytest)
+  rfPrecision <- precision(rfPredict, ytest)
+  
+  # 3.5 Evaluate Recall
+  svmRecall <- recall(svmPredict, ytest)
+  rfRecall <- recall(rfPredict, ytest)
+  
+  # 3.6 Evaluate F1 Score
+  svmF1 <- (2 * svmPrecision * svmRecall) / (svmPrecision + svmRecall)
+  rfF1 <- (2 * rfPrecision * rfRecall) / (rfPrecision + rfRecall)
+  
+  # 3.7 Add to results
+  results$svm <- c(results$svm, svmF1)
+  results$rf <- c(results$rf, rfF1)
+}
+
+# 4. Aggregate results
+resultMeans <- c(mean(results$svm), mean(results$rf))
+resultsCombined <- c(results$svm, results$rf)
+
+```
+
+# Results
+
+The results ranged from CV F1 scores of `r round(min(resultsCombined), 2)` to `r round(max(resultsCombined), 2)`. The performance was relatively poor for both learners in the cross validation scenario. Figure \@ref(fig:fig2) shows the average CV F1 scores obtained from the experiments. The word feature importances are also shown in Figure \@ref(fig:fig3). The top ten word features based on feature importances was selected from these options.
+
+```{r fig2, fig.cap="Average F1 Scores"}
+barplot(resultMeans, names.arg=c("SVM", "RF"), xlab="Learner", ylab="Average F1 Score")
+```
+
+```{r fig3, fig.cap="Feature Importances"}
+barplot(impw[[1]], names.arg=row.names(impw), ylab="Feature Importance", las=2)
+```
+
+\newpage
+
+# Conclusion
+
+Both the RF and SVM algorithms performed similarily. However, the random forest was useful in calculating feature importances used in the feature selection process to reduce the number of dimensions on the data, as well as quantify how much more important one word feature was compared to another word feature. In particular, the word features *love, nice, works, no,* and *worst* were very useful in classifying the sentiment attribute consisting of 0 or 1s indicating negative and positive respectively. Although, the RF and SVM performed rather poorly, the results were reasonable and interpretable to see what influences postive and negative sentiment without manually reviewing thousands of online reactions. The high dimensionality of the data after processing for the bag of words model made it difficult to obtain quick and efficient methods of feature reduction, however the abundance of features made it more flexible when arbitrary rules were imposed - such as the strict correlation values restriction imposed in the methods Section. Algorithms that can efficiently either utilize high dimensional data or reduce it, but still enable the results to be interpretable would be very useful in machine learning problems involving text.
+
+\newpage
+
+# References
+
+<div id="refs"></div>
 
 \newpage
 
@@ -329,7 +505,7 @@ The data from the feature selection was split into a standard 10-fold cross vali
 # Dependencies ----
 
 # (package_install) Required packages and loading
-packages <- c("text2vec")
+packages <- c("text2vec", "caret", "FSelector", "e1071")
 for (pkg in packages) {
   if (!requireNamespace(pkg, quietly=TRUE)) {
     install.packages(pkg,
@@ -350,32 +526,36 @@ download.file(src, zipped)
 unzip(zipped, exdir=temp)
 
 # 2. Obtain SLS data paths from unzipped folder
-dsFolder <- file.path(temp, "sentiment labelled sentences")
-dsIgnore <- file.path(dsFolder, c(".DS_Store", "readme.txt"))
-dsFiles <- list.files(dsFolder, full.names=TRUE)
-dsFiles <- dsFiles[!dsFiles %in% dsIgnore]
+slsFolder <- file.path(temp, "sentiment labelled sentences")
+slsIgnore <- file.path(slsFolder, c(".DS_Store", "readme.txt"))
+slsFiles <- list.files(slsFolder, full.names=TRUE)
+slsFiles <- slsFiles[!slsFiles %in% slsIgnore]
 
 # Parsing (See Section 4.1.1) ----
 
 # 1. Read the data on a line by line basis
-ds <- sapply(dsFiles, readLines)
+sls <- sapply(slsFiles, readLines)
 
 # 2. Extract sentence and sentiment attributes
 x <- c() # sentence attribute
 y <- c() # sentiment attribute
-for (n in ds) { # each instance n
+for (n in sls) { # each instance n
   lx <- nchar(n) # sentence length
   xn <- substr(n, 1, lx - 2) # sentence instance
+  xn <- gsub('[[:punct:] ]+',' ', xn) # remove punctuation
   yn <- as.numeric(substr(n, lx - 1, lx)) # sentiment instance
   x <- c(x, xn)
   y <- c(y, yn)
 }
-dsParsed <- data.frame(sentence=x, sentiment=y, stringsAsFactors=FALSE)
+ds <- data.frame(sentence=x, sentiment=y, stringsAsFactors=FALSE)
 
 # Features (See Section 4.1.2) ----
 
+# 0. Define variables
+xn <- ds$sentence
+yn <- ds$sentiment
+
 # 1. Obtain words wn for each xn using a tokenizer
-xn <- dsParsed$sentence
 wn <- itoken(xn, tolower, word_tokenizer)
 
 # 2. Vocabulary of wk words for wn 
@@ -384,8 +564,80 @@ wk <- vocab_vectorizer(create_vocabulary(wn))
 # 3. Obtain word features matrix wnk given n instances and k words
 wnk <- as.matrix(get_dtm(create_corpus(wn, wk)))
 
+# Selection (See Section 4.2.1) ----
+
+# 1. Keep only words that occur more than 0.1% of occurences
+freqc <- apply(wnk, 2, sum)
+wnk <- wnk[, which(freqc > sum(freqc) * 0.001)]
+
+# 2. Remove highly correlated features over 0.05
+wcor <- findCorrelation(cor(wnk), cutoff = 0.05)
+wnk <- wnk[, -wcor]
+
+# 4. Calculate RF feature importances and select top 10
+impw <- random.forest.importance(yn ~ ., data.frame(wnk, yn))
+top10 <- cutoff.k(impw, 10)
+top10 <- top10[top10 %in% colnames(wnk)]
+wnk <- wnk[, top10]
+
+# Cross Validation (See Section 4.2.2) ----
+
+# Each element are the row ids of a 10 fold CV
+cv <- createFolds(1:nrow(wnk),
+                  k = 10,
+                  list = TRUE,
+                  returnTrain = TRUE)
+
+# Learners (See Section 4.2.3) ----
+
+# 1. Set algorithms dependencies
+randomForest <- randomForest::randomForest
+
+# 2. Results list to collect Predictions
+results <- list(
+  svm = c(),
+  rf = c()
+)
+
+# 3. Predict on 10 fold CV
+yn <- as.factor(yn)
+for (ids in cv) {
+  
+  # 3.1 Training data
+  xtrain <- wnk[ids, ]
+  ytrain <- yn[ids]
+  
+  # 3.2 Testing data
+  xtest <- wnk[-ids, ]
+  ytest <- yn[-ids]
+  
+  # 3.3 Create models
+  svmModel <- svm(x=xtrain, y=ytrain, kernel = "linear")
+  rfModel <- randomForest(x=xtrain, y=ytrain, ntrees = 500)
+  
+  # 3.3 Predictions
+  svmPredict <- predict(svmModel, xtest)
+  rfPredict <- predict(rfModel, xtest)
+  
+  # 3.4 Evaluate Precision
+  svmPrecision <- precision(svmPredict, ytest)
+  rfPrecision <- precision(rfPredict, ytest)
+  
+  # 3.5 Evaluate Recall
+  svmRecall <- recall(svmPredict, ytest)
+  rfRecall <- recall(rfPredict, ytest)
+  
+  # 3.6 Evaluate F1 Score
+  svmF1 <- (2 * svmPrecision * svmRecall) / (svmPrecision + svmRecall)
+  rfF1 <- (2 * rfPrecision * rfRecall) / (rfPrecision + rfRecall)
+  
+  # 3.7 Add to results
+  results$svm <- c(results$svm, svmF1)
+  results$rf <- c(results$rf, rfF1)
+}
+
+# 4. Aggregate results
+resultMeans <- c(mean(results$svm), mean(results$rf))
+resultsCombined <- c(results$svm, results$rf)
+
 ```
-
-\newpage
-
-# References
