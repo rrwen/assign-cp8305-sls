@@ -1,5 +1,5 @@
 ---
-title: "Natural Language Processing and Prediction of Sentiment Labelled Sentences"
+title: "Experiments on Natural Language Processing and Prediction of Sentiment Labelled Sentences"
 author: |
   | Richard Wen
   | Ryerson University
@@ -129,22 +129,11 @@ references:
     year: 2016
   volume: 28
   issue: 5
-- id: romanski2016
-  title: "FSelector: Selecting Attributes"
-  author:
-  - family: romanski
-    given: Piotr
-  - family: Kotthoff
-    given: Lars
-  URL: "https://CRAN.R-project.org/package=FSelector "
-  page: 1-5
-  issued:
-    year: 2016
 - id: meyer2017
   title: "e1071: Misc Functions of the Department of Statistics, Probability Theory Group (Formerly: E1071), TU Wien"
   author:
-  - family: meyer
-    given: david
+  - family: Meyer
+    given: David
   URL: "https://cran.r-project.org/package=e1071"
   issued:
     year: 2017
@@ -153,7 +142,7 @@ references:
 ```{r setup, include = FALSE}
 
 # (package_install) Required packages
-packages <- c("bookdown", "knitr", "text2vec", "caret", "e1071")
+packages <- c("text2vec", "caret", "e1071", "randomForest")
 for (pkg in packages) {
   if (!requireNamespace(pkg, quietly=TRUE)) {
     install.packages(pkg,
@@ -291,7 +280,7 @@ An accuracy measurement $f_{acc}$, where $C_{acc}$ is a constant representing th
 (\#eq:eq5)
 \end{equation}
 
-An error measurement $f_{err}$, where $C_{err}$ is a constant representing the worse prediction quality, decreases the more times $y_{pred}^{(n)}$ is equal to $y^{(n)}$ given $f_{eq}$ as seen in \@ref(eq:eq6):
+An error measurement $f_{err}$, where $C_{err}$ is a constant representing the worse prediction quality, decreases the more times $y_{pred}^{(n)}$ is equal to $y^{(n)}$ given $f_{eq}$ as seen in Equation \@ref(eq:eq6):
 
 \begin{equation}
   \lim_{f_{err} \to C_{err}} f_{acc} \enspace as \enspace f_{eq} \rightarrow \infty \enspace \mid f_{err} = f(y_{pred}^{(n)}, y^{(n)})
@@ -300,7 +289,7 @@ An error measurement $f_{err}$, where $C_{err}$ is a constant representing the w
 
 # Methods
 
-The methods described in this section attempt to produce a solution (known as the Best Attempt (BA) solution) to the classification problem defined in Section [3][Problem]. The unstructured nature of the sentence attribute presented required preprocessing to create features which are then further preprocessed to search for adequately useful features (selection). These features were then randomly split into approximately equal number of instances for cross validation training sets. These training sets were then used as input for a selected number of algorithms, which were optimized for algorithm specific parameters and evaluated for prediction quality. A summary of the methods is shown in Figure \@ref(fig:fig1). See Appendix [A][Appendix A: R Code] for the R code.
+The methods described in this section attempted to experiment with several solutions to the classification problem defined in Section [3][Problem]. The unstructured nature of the sentence attribute presented required preprocessing to create features which are then further preprocessed to search for adequately useful features (selection). These features were then randomly split into approximately equal number of instances for cross validation training sets. These training sets were then used as input for a selected number of algorithms, which were optimized for algorithm specific parameters and evaluated for prediction quality. A summary of the methods is shown in Figure \@ref(fig:fig1). See Appendix [A][Appendix A: R Code] for the R code.
 
 ```{r fig1, fig.cap="Flowchart of Methods"}
 knitr::include_graphics("img/fig1.png")
@@ -354,8 +343,9 @@ knitr::kable(
 ```{r features, cache=TRUE}
 
 library(text2vec)
+
+# 0. Variables
 xn <- ds$sentence
-yn <- ds$sentiment
 
 # 1. Obtain words wn for each xn using a tokenizer
 wn <- itoken(xn, tolower, word_tokenizer)
@@ -374,12 +364,15 @@ The algorithms applied to solve the classification problem in involved optimizin
 
 ### Feature Selection
 
-Feature selection was used to filter the word features $w^{(k)}$ for the most important word features. A measure of importance was defined by using the Random Forest (RF) algorithm. The RF algorithm ensembles multiple decision trees by randomly subsetting portions of the complete data to construct each tree [@breiman2001]. For each portion of data subsetted, there were remaining portions that were used to calculate an Out Of Bag (OOB) error by using the constructed decison trees to predict on the remaining data portions. These remaining portions were referred to as the OOB samples, and were used in calculating the feature importances. Each $k$ word feature $w^{(k)}$ was then calculated for feature importances by randomly permuting prediction errors on the OOB samples, and comparing their differences on the between the permuted and un-permuted errors. These feature importances quantify the usefulness of word features for the classification problem, where higher values represent more useful features and lower values represent less useful features. Initially, features in which the occurence of the word is less than 0.1% of the total number of ocurrences were removed, followed by stricture feature removal of features that were even slightly correlated, where features with correlation values of greater than 0.05 were removed. This enabled independance assumptions to be better satisfied as there were an abundance of features. The feature selection then filtered for the top 10 features with the highest feature importance. The feature selection algorithm was applied using the *FSelector* and *caret* packages [@kuhn2016;@romanski2016].
+Feature selection was used to filter the word features $w^{(k)}$ for the most important word features. A measure of importance was defined by using the Random Forest (RF) algorithm. The RF algorithm ensembles multiple decision trees by randomly subsetting portions of the complete data to construct each tree [@breiman2001]. For each portion of data subsetted, there were remaining portions that were used to calculate an Out Of Bag (OOB) error by using the constructed decison trees to predict on the remaining data portions. These remaining portions were referred to as the OOB samples, and were used in calculating the feature importances. Each $k$ word feature $w^{(k)}$ was then calculated for feature importances by randomly permuting prediction errors on the OOB samples, and comparing their differences on the between the permuted and un-permuted errors. These feature importances quantify the usefulness of word features for the classification problem, where higher values represent more useful features and lower values represent less useful features. Initially, features in which the occurence of the word is less than 0.1% of the total number of ocurrences were removed, followed by stricture feature removal of features that were even slightly correlated, where features with correlation values of greater than 0.05 were removed. This enabled independance assumptions to be better satisfied as there were an abundance of features. The feature selection then filtered for the top 10 features with the highest feature importance based on a random forest classifier with 500 trees. The feature selection algorithm was applied using the *caret* package [@romanski2016].
 
 ```{r selection, cache=TRUE}
 
 library(caret)
-library(FSelector)
+library(randomForest)
+
+# 0. Variables
+yn <- as.factor(ds$sentiment)
 
 # 1. Keep only words that occur more than 0.1% of occurences
 freqc <- apply(wnk, 2, sum)
@@ -390,10 +383,16 @@ wcor <- findCorrelation(cor(wnk), cutoff = 0.05)
 wnk <- wnk[, -wcor]
 
 # 4. Calculate RF feature importances and select top 10
-impw <- random.forest.importance(yn ~ ., data.frame(wnk, yn))
-top10 <- cutoff.k(impw, 10)
-top10 <- top10[top10 %in% colnames(wnk)]
-wnk <- wnk[, top10]
+rfFit <- randomForest(
+  x=wnk,
+  y=yn,
+  importance=TRUE,
+  proximity=TRUE,
+  ntree=500
+)
+impw <- importance(rfFit)[, 4]
+impw <- impw[order(-impw)]
+wnk <- wnk[, names(impw)[1:10]]
 
 ```
 
@@ -413,24 +412,23 @@ cv <- caret::createFolds(1:nrow(wnk),
 
 ### Selected Learners
 
-The learners selected for the BA solution were standard machine learning choices that were relatively efficient and simple to run as the strict correlation removal procedure enabled independent features of low dimensionality. The selected machine learning algorithms are the Support Vector Machine (SVM) and Random Forest (RF) from the R package *e1071* [@meyer2017]. The selected algorithms were evaluated based on their F1 score to account for potential binary class imbalances in the sentient attribute. See Appendix A for more details.
+The learners selected for the experiments were standard machine learning choices that were relatively efficient and simple to run as the strict correlation removal procedure enabled independent features of low dimensionality. The selected machine learning algorithms are the Naive Bayes Classifier (NBC), Support Vector Machine (SVM) and Random Forest (RF) from the R package *e1071* [@meyer2017]. The selected algorithms were evaluated based on their F1 score to account for potential binary class imbalances in the sentient attribute. See the learners section under Appendix A for more details.
 
-```{r methods, cache=TRUE}
+```{r learners, cache=TRUE}
 library(e1071)
 
 # 1. Set algorithms dependencies
-randomForest <- randomForest::randomForest
 precision <- caret::precision
 recall <- caret::recall
 
 # 2. Results list to collect Predictions
 results <- list(
   svm = c(),
-  rf = c()
+  rf = c(),
+  nbc = c()
 )
 
 # 3. Predict on 10 fold CV
-yn <- as.factor(yn)
 for (ids in cv) {
   
   # 3.1 Training data
@@ -442,53 +440,71 @@ for (ids in cv) {
   ytest <- yn[-ids]
   
   # 3.3 Create models
+  nbcModel <- naiveBayes(x=wnk, y=yn, laplace=1)
   svmModel <- svm(x=xtrain, y=ytrain, kernel = "linear")
   rfModel <- randomForest(x=xtrain, y=ytrain, ntrees = 500)
   
   # 3.3 Predictions
+  nbcPredict <- predict(nbcModel, xtest)
   svmPredict <- predict(svmModel, xtest)
   rfPredict <- predict(rfModel, xtest)
   
   # 3.4 Evaluate Precision
+  nbcPrecision <- precision(nbcPredict, ytest)
   svmPrecision <- precision(svmPredict, ytest)
   rfPrecision <- precision(rfPredict, ytest)
   
   # 3.5 Evaluate Recall
+  nbcRecall <- recall(nbcPredict, ytest)
   svmRecall <- recall(svmPredict, ytest)
   rfRecall <- recall(rfPredict, ytest)
   
   # 3.6 Evaluate F1 Score
+  nbcF1 <- (2 * nbcPrecision * nbcRecall) / (nbcPrecision + nbcRecall)
   svmF1 <- (2 * svmPrecision * svmRecall) / (svmPrecision + svmRecall)
   rfF1 <- (2 * rfPrecision * rfRecall) / (rfPrecision + rfRecall)
   
   # 3.7 Add to results
+  results$nbc <- c(results$nbc, nbcF1)
   results$svm <- c(results$svm, svmF1)
   results$rf <- c(results$rf, rfF1)
 }
 
 # 4. Aggregate results
-resultMeans <- c(mean(results$svm), mean(results$rf))
-resultsCombined <- c(results$svm, results$rf)
+resultMeans <- c(
+  mean(results$svm),
+  mean(results$rf),
+  mean(results$nbc)
+)
+resultsCombined <- c(results$svm, results$rf, results$nbc)
 
 ```
 
 # Results
 
-The results ranged from CV F1 scores of `r round(min(resultsCombined), 2)` to `r round(max(resultsCombined), 2)`. The performance was relatively poor for both learners in the cross validation scenario. Figure \@ref(fig:fig2) shows the average CV F1 scores obtained from the experiments. The word feature importances are also shown in Figure \@ref(fig:fig3). The top ten word features based on feature importances was selected from these options.
+Figure \@ref(fig:fig2) shows the distribution of classes in the sentiment attribute. The results ranged from CV F1 scores of `r round(min(resultsCombined), 2)` to `r round(max(resultsCombined), 2)` per fold. Figure \@ref(fig:fig3) shows the average CV F1 scores obtained from the experiments. The word feature importances are also shown in Figure \@ref(fig:fi4). The top ten word features based on feature importances was selected from these options, which produced a training feature matrix of 10 columns by `r rawInstances` rows, with each $k$ column representing $w^{k}$ word vectors.
 
-```{r fig2, fig.cap="Average F1 Scores"}
-barplot(resultMeans, names.arg=c("SVM", "RF"), xlab="Learner", ylab="Average F1 Score")
+```{r fig2, fig.cap="Sentiment Class Distribution"}
+barplot(
+  c(sum(ds$sentiment), rawInstances - sum(ds$sentiment)),
+  names.arg=c("Positive(0)", "Negative (1)"),
+  xlab="Sentiment", ylab="Frequency"
+)
 ```
 
-```{r fig3, fig.cap="Feature Importances"}
-barplot(impw[[1]], names.arg=row.names(impw), ylab="Feature Importance", las=2)
+```{r fig3, fig.cap="Average F1 Scores"}
+barplot(resultMeans, names.arg=c("SVM", "RF", "NBC"), xlab="Learner", ylab="Average F1 Score")
+```
+
+```{r fig4, fig.cap="Feature Importances"}
+barplot(impw, names.arg=names(impw), ylab="Feature Importance", las=2)
 ```
 
 \newpage
 
-# Conclusion
+# Discussion and Conclusion
 
-Both the RF and SVM algorithms performed similarily. However, the random forest was useful in calculating feature importances used in the feature selection process to reduce the number of dimensions on the data, as well as quantify how much more important one word feature was compared to another word feature. In particular, the word features *love, nice, works, no,* and *worst* were very useful in classifying the sentiment attribute consisting of 0 or 1s indicating negative and positive respectively. Although, the RF and SVM performed rather poorly, the results were reasonable and interpretable to see what influences postive and negative sentiment without manually reviewing thousands of online reactions. The high dimensionality of the data after processing for the bag of words model made it difficult to obtain quick and efficient methods of feature reduction, however the abundance of features made it more flexible when arbitrary rules were imposed - such as the strict correlation values restriction imposed in the methods Section. Algorithms that can efficiently either utilize high dimensional data or reduce it, but still enable the results to be interpretable would be very useful in machine learning problems involving text.
+The NBC algorithm Both the RF and SVM algorithms performed similarily. However, the random forest was useful in calculating feature importances used in the feature selection process to reduce the number of dimensions on the data, as well as quantify how much more important one word feature was compared to another word feature. In particular, the word features *love, nice, works, no,* and *worst* were very useful in classifying the sentiment attribute consisting of 0 or 1s indicating negative and positive respectively. Although, the RF and SVM performed rather poorly, the results were reasonable given the large reduction in features. This is done in exchange for interpretability of results to see what influences positive and negative sentiment without manually reviewing thousands of online reactions. The high dimensionality of the data after processing for the bag of words model made it difficult to obtain quick and efficient methods of feature reduction, however the abundance of features made it more flexible when arbitrary rules were imposed - such as the strict correlation values restriction imposed in the methods. This led to better features for the NBC algorithm, which resulted in the highest average CV F1 score compared to the RF and SVM with little hyperparameter tuning. The NBC was a simple, yet efficient and effective algorithm, when features were selected to meet its assumptions of feature independence. Algorithms that can efficiently either utilize high dimensional data or reduce dimensionality with minimal information loss, but still enable the results to be interpretable would be very desirable in machine learning problems involving text based attributes that can be converted into a bag of words model.
 
 \newpage
 
@@ -505,7 +521,12 @@ Both the RF and SVM algorithms performed similarily. However, the random forest 
 # Dependencies ----
 
 # (package_install) Required packages and loading
-packages <- c("text2vec", "caret", "FSelector", "e1071")
+packages <- c(
+  "RandomForest",
+  "text2vec",
+  "caret",
+  "e1071"
+)
 for (pkg in packages) {
   if (!requireNamespace(pkg, quietly=TRUE)) {
     install.packages(pkg,
@@ -551,9 +572,8 @@ ds <- data.frame(sentence=x, sentiment=y, stringsAsFactors=FALSE)
 
 # Features (See Section 4.1.2) ----
 
-# 0. Define variables
+# 0. Variables
 xn <- ds$sentence
-yn <- ds$sentiment
 
 # 1. Obtain words wn for each xn using a tokenizer
 wn <- itoken(xn, tolower, word_tokenizer)
@@ -566,6 +586,9 @@ wnk <- as.matrix(get_dtm(create_corpus(wn, wk)))
 
 # Selection (See Section 4.2.1) ----
 
+# 0. Variables
+yn <- as.factor(ds$sentiment)
+
 # 1. Keep only words that occur more than 0.1% of occurences
 freqc <- apply(wnk, 2, sum)
 wnk <- wnk[, which(freqc > sum(freqc) * 0.001)]
@@ -575,10 +598,16 @@ wcor <- findCorrelation(cor(wnk), cutoff = 0.05)
 wnk <- wnk[, -wcor]
 
 # 4. Calculate RF feature importances and select top 10
-impw <- random.forest.importance(yn ~ ., data.frame(wnk, yn))
-top10 <- cutoff.k(impw, 10)
-top10 <- top10[top10 %in% colnames(wnk)]
-wnk <- wnk[, top10]
+rfFit <- randomForest(
+  x=wnk,
+  y=yn,
+  importance=TRUE,
+  proximity=TRUE,
+  ntree=500
+)
+impw <- importance(rfFit)[, 4]
+impw <- impw[order(-impw)]
+wnk <- wnk[, names(impw)[1:10]]
 
 # Cross Validation (See Section 4.2.2) ----
 
@@ -590,17 +619,18 @@ cv <- createFolds(1:nrow(wnk),
 
 # Learners (See Section 4.2.3) ----
 
-# 1. Set algorithms dependencies
-randomForest <- randomForest::randomForest
+# 1. Set performance measures
+precision <- caret::precision
+recall <- caret::recall
 
 # 2. Results list to collect Predictions
 results <- list(
   svm = c(),
-  rf = c()
+  rf = c(),
+  nbc = c()
 )
 
 # 3. Predict on 10 fold CV
-yn <- as.factor(yn)
 for (ids in cv) {
   
   # 3.1 Training data
@@ -612,32 +642,41 @@ for (ids in cv) {
   ytest <- yn[-ids]
   
   # 3.3 Create models
+  nbcModel <- naiveBayes(x=wnk, y=yn, laplace=1)
   svmModel <- svm(x=xtrain, y=ytrain, kernel = "linear")
   rfModel <- randomForest(x=xtrain, y=ytrain, ntrees = 500)
   
   # 3.3 Predictions
+  nbcPredict <- predict(nbcModel, xtest)
   svmPredict <- predict(svmModel, xtest)
   rfPredict <- predict(rfModel, xtest)
   
   # 3.4 Evaluate Precision
+  nbcPrecision <- precision(nbcPredict, ytest)
   svmPrecision <- precision(svmPredict, ytest)
   rfPrecision <- precision(rfPredict, ytest)
   
   # 3.5 Evaluate Recall
+  nbcRecall <- recall(nbcPredict, ytest)
   svmRecall <- recall(svmPredict, ytest)
   rfRecall <- recall(rfPredict, ytest)
   
   # 3.6 Evaluate F1 Score
+  nbcF1 <- (2 * nbcPrecision * nbcRecall) / (nbcPrecision + nbcRecall)
   svmF1 <- (2 * svmPrecision * svmRecall) / (svmPrecision + svmRecall)
   rfF1 <- (2 * rfPrecision * rfRecall) / (rfPrecision + rfRecall)
   
-  # 3.7 Add to results
+  # 3.7 Add F1 score of fold to results
+  results$nbc <- c(results$nbc, nbcF1)
   results$svm <- c(results$svm, svmF1)
   results$rf <- c(results$rf, rfF1)
 }
 
 # 4. Aggregate results
-resultMeans <- c(mean(results$svm), mean(results$rf))
-resultsCombined <- c(results$svm, results$rf)
+resultMeans <- c(
+  mean(results$svm),
+  mean(results$rf),
+  mean(results$nbc)
+)
 
 ```
