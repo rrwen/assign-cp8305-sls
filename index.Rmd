@@ -5,13 +5,13 @@ author: |
   | Ryerson University
 date: "April 13, 2017"
 output:
+  bookdown::gitbook:
+    split_by: none
   bookdown::pdf_document2:
     fig_caption: yes
     fig_height: 6
     fig_width: 8
     latex_engine: lualatex
-  bookdown::gitbook:
-    split_by: none
 mainfont: Times New Roman
 header-includes:
 - \usepackage{setspace}
