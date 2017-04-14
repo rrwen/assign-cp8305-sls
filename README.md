@@ -7,7 +7,7 @@ Assignment for Course CP8305
 Instructed by Dr. Cherie Ding  
 
 - [Read Online](https://rrwen.github.io/assign-cp8305-sls)
-- [PDF](https://github.com/rrwen/assign-cp8305-sls/blob/master/pdf/index.pdf)
+- [PDF](https://github.com/rrwen/assign-cp8305-sls/blob/master/index.pdf)
 
 ## References
 
