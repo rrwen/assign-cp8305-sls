@@ -6,13 +6,13 @@ author: |
   | Ryerson University
 date: "April 13, 2017"
 output:
-  bookdown::gitbook:
-    split_by: none
   bookdown::pdf_document2:
     fig_caption: yes
     fig_height: 6
     fig_width: 8
     latex_engine: lualatex
+  bookdown::gitbook:
+    split_by: none
 mainfont: Times New Roman
 header-includes:
 - \usepackage{setspace}
@@ -138,6 +138,30 @@ references:
   URL: "https://cran.r-project.org/package=e1071"
   issued:
     year: 2017
+- id: mccallum1998
+  title: "A comparison of event models for naive bayes text classification"
+  container-title: "AAAI-98 workshop on learning for text categorization"
+  author:
+  - family: McCallum
+    given: Andrew
+  - family: Kamal
+    given: Nigam
+  volume: 752
+  page: 41-48
+  issued:
+    year: 1998
+- id: tong2001
+  title: "Support vector machine active learning with applications to text classification"
+  author:
+  - family: Tong
+    given: Simon
+  - family: Koller
+    name: Daphne
+  container-title: "Journal of machine learning research"
+  volume: 2
+  page: 45-66
+  issued:
+    year: 2001
 ---
 
 ```{r setup, include = FALSE}
@@ -231,7 +255,7 @@ knitr::kable(
 
 # Problem
 
-The goal of the SLS dataset was to predict the values in attribute 2 (sentiment) which contain 0 or 1 for negative and positive sentiment respectively. The binary values of attribute 2 defined the SLS dataset as a classification problem. In order to predict sentiment, sentences from three different websites ([imdb.com](www.imdb.com), [amazon.com](www.amazon.com), and [yelp.com](www.yelp.com)) were given as the explanatory attribute 1. The text values of attribute 1 further defined the problem as a Natural Language Processing (NLP)^[NLP seeks to extract meaning from textual data involving language communication with low level tasks such as identification of individual words and high level tasks such as spelling correction [@prakash2011]] problem where the attribute values were unstructured, and required pre-processing before the machine could read and learn to model the SLS data. For simplicity, attribute 1 was referred to as the sentence attribute and attribute 2 was referred to as the sentiment attribute. The problem was then known as a classification problem for the sentiment attribute that required NLP of the sentence attribute. The following sections more formally define the problem framework.
+The goal of the SLS dataset was to predict the values in attribute 2 (sentiment) which contain 0 or 1 for negative and positive sentiment respectively. The binary values of attribute 2 defined the SLS dataset as a classification problem. In order to predict sentiment, sentences from three different websites ([imdb.com](www.imdb.com), [amazon.com](www.amazon.com), and [yelp.com](www.yelp.com)) were given as the explanatory attribute 1. The text values of attribute 1 further defined the problem as a Natural Language Processing (NLP)^[NLP seeks to extract meaning from textual data involving language communication with low level tasks such as identification of individual words and high level tasks such as spelling correction [@prakash2011]] problem where the attribute values were unstructured, and required pre-processing before the machine could read and learn to model the SLS data. For simplicity, attribute 1 was referred to as the sentence attribute and attribute 2 was referred to as the sentiment attribute. The problem was then known as a supervised classification^[A supervised classification, in this case, refers to the target sentiment classes being known, and the target sentiment values being discrete rather than continuous or numeric in meaning] problem for the sentiment attribute that required NLP of the sentence attribute. The following sections more formally define the problem framework.
 
 ## Sentiment Attribute
 
@@ -284,7 +308,7 @@ An accuracy measurement $f_{acc}$, where $C_{acc}$ is a constant representing th
 An error measurement $f_{err}$, where $C_{err}$ is a constant representing the worse prediction quality, decreases the more times $y_{pred}^{(n)}$ is equal to $y^{(n)}$ given $f_{eq}$ as seen in Equation \@ref(eq:eq6):
 
 \begin{equation}
-  \lim_{f_{err} \to C_{err}} f_{acc} \enspace as \enspace f_{eq} \rightarrow \infty \enspace \mid f_{err} = f(y_{pred}^{(n)}, y^{(n)})
+  \lim_{f_{err} \to C_{err}} f_{err} \enspace as \enspace f_{eq} \rightarrow \infty \enspace \mid f_{err} = f(y_{pred}^{(n)}, y^{(n)})
 (\#eq:eq6)
 \end{equation}
 
@@ -418,7 +442,22 @@ cv <- caret::createFolds(1:nrow(wnk),
 
 ### Selected Learners
 
-The learners selected for the experiments were standard machine learning choices that were relatively efficient and simple to run as the strict correlation removal procedure and feature selection process enabled relatively independent features of low dimensionality. The selected machine learning algorithms are the Naive Bayes Classifier (NBC), Support Vector Machine (SVM) and Random Forest (RF) from the R package *e1071* [@meyer2017]. The selected algorithms were evaluated based on their F1 score to account for potential binary class imbalances in the sentiment attribute. See the learners section under Appendix [A][Appendix A: R Code] for more details.
+The learners selected for the experiments were standard machine learning choices that were relatively efficient and simple to run as the strict correlation removal procedure and feature selection process enabled relatively independent features of low dimensionality. The selected machine learning algorithms are the Naive Bayes Classifier (NBC), Support Vector Machine (SVM) and Random Forest (RF) from the R package *e1071* [@meyer2017]. NBC is a conditional probability model that applies Baye's theorem with the assumption that the features being trained on are independent of each other [@mccallum1998]. RF is a model that constructs many decision trees from random subsamples of the instances and features, and ensembles them for a majority vote of the predicted class [@breiman2001]. SVM is a non-probabilistic binary model that constructs a set of hyperplanes in high dimensional space to separate target classes [@tong2001]. The selected algorithms were evaluated based on their F1 score to account for potential binary class imbalances in the sentiment attribute. The F1 score (Equation \@ref(eq:eq9)) is the harmonic mean of  the precision (Equation \@ref(eq:eq8)) and recall (Equation \@ref(eq:eq7)) given the number of correctly predicted instances $Y_{corr}$, $N$ instances, $Y_{s}$ correctly predicted instances for a sentiment $s$, and the number of instances for a sentiment $N_{s}$. See the learners section under Appendix [A][Appendix A: R Code] for more details.
+
+\begin{equation}
+  Precision = Y_{corr} / N
+(\#eq:eq7)
+\end{equation}
+
+\begin{equation}
+  Recall = Y_{s} / N_{s}
+(\#eq:eq8)
+\end{equation}
+
+\begin{equation}
+  F1 = 2 \times \dfrac{Precision \times Recall}{Precision + Recall}
+(\#eq:eq9)
+\end{equation}
 
 ```{r learners, cache=TRUE}
 library(e1071)
