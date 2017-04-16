@@ -6,13 +6,13 @@ author: |
   | Ryerson University
 date: "April 13, 2017"
 output:
+  bookdown::gitbook:
+    split_by: none
   bookdown::pdf_document2:
     fig_caption: yes
     fig_height: 6
     fig_width: 8
     latex_engine: lualatex
-  bookdown::gitbook:
-    split_by: none
 mainfont: Times New Roman
 header-includes:
 - \usepackage{setspace}
@@ -442,10 +442,10 @@ cv <- caret::createFolds(1:nrow(wnk),
 
 ### Selected Learners
 
-The learners selected for the experiments were standard machine learning choices that were relatively efficient and simple to run as the strict correlation removal procedure and feature selection process enabled relatively independent features of low dimensionality. The selected machine learning algorithms are the Naive Bayes Classifier (NBC), Support Vector Machine (SVM) and Random Forest (RF) from the R package *e1071* [@meyer2017]. NBC is a conditional probability model that applies Baye's theorem with the assumption that the features being trained on are independent of each other [@mccallum1998]. RF is a model that constructs many decision trees from random subsamples of the instances and features, and ensembles them for a majority vote of the predicted class [@breiman2001]. SVM is a non-probabilistic binary model that constructs a set of hyperplanes in high dimensional space to separate target classes [@tong2001]. The selected algorithms were evaluated based on their F1 score to account for potential binary class imbalances in the sentiment attribute. The F1 score (Equation \@ref(eq:eq9)) is the harmonic mean of  the precision (Equation \@ref(eq:eq8)) and recall (Equation \@ref(eq:eq7)) given the number of correctly predicted instances $Y_{corr}$, $N$ instances, $Y_{s}$ correctly predicted instances for a sentiment $s$, and the number of instances for a sentiment $N_{s}$. See the learners section under Appendix [A][Appendix A: R Code] for more details.
+The learners selected for the experiments were standard machine learning choices that were relatively efficient and simple to run as the strict correlation removal procedure and feature selection process enabled relatively independent features of low dimensionality. The selected machine learning algorithms are the Naive Bayes Classifier (NBC), Support Vector Machine (SVM) and Random Forest (RF) from the R package *e1071* [@meyer2017]. NBC is a conditional probability model that applies Baye's theorem with the assumption that the features being trained on are independent of each other [@mccallum1998]. RF is a model that constructs many decision trees from random subsamples of the instances and features, and ensembles them for a majority vote of the predicted class [@breiman2001]. SVM is a non-probabilistic binary model that constructs a set of hyperplanes in high dimensional space to separate target classes [@tong2001]. The selected algorithms were evaluated based on their F1 score to account for potential binary class imbalances in the sentiment attribute. The F1 score (Equation \@ref(eq:eq9)) is the harmonic mean of  the precision (Equation \@ref(eq:eq8)) and recall (Equation \@ref(eq:eq7)) given $N$ instances, $Y_{s}$ correctly predicted instances for a sentiment $s$, and the number of instances for a sentiment $N_{s}$. See the learners section under Appendix [A][Appendix A: R Code] for more details.
 
 \begin{equation}
-  Precision = Y_{corr} / N
+  Precision = Y_{s} / N
 (\#eq:eq7)
 \end{equation}
 
