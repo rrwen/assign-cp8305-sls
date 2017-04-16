@@ -26,3 +26,14 @@ To render Portable Document File (PDF) and HTML:
 3. In the R console, enter `install.packages("bookdown")`
 4. Click *Knit*-> *Knit to gitbook* (HTML)
 5. Click *Knit*-> *Knit to pdf_document2* (PDF)
+
+Push to git:
+
+1. Install [git](https://git-scm.com/) if not installed
+2. Run the following commands to commit to remote repository
+
+```
+git add .
+git commit -a -m "General update"
+git push
+```
