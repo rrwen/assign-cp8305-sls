@@ -6,7 +6,7 @@ April 13, 2017
 Assignment for Course CP8305  
 Instructed by Dr. Cherie Ding  
 
-- [Read Online](https://rrwen.github.io/assign-cp8305-sls)
+- [HTML](https://rrwen.github.io/assign-cp8305-sls)
 - [PDF](https://github.com/rrwen/assign-cp8305-sls/blob/master/index.pdf)
 
 ## References
@@ -34,6 +34,12 @@ Push to git:
 
 ```
 git add .
-git commit -a -m "General update"
+git commit -a -m "Generic update"
 git push
 ```
+
+Some known issues:
+
+- Error when using `rmarkdown::render` function for PDF
+- Error when using knit in Rstudio, but correct PDF is generated
+
