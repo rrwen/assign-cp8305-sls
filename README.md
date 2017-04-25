@@ -3,11 +3,11 @@
 Richard Wen  
 rwen@ryerson.ca      
 April 13, 2017  
-Assignment for Course CP8305  
+Assignment for Knowledge Discovery Course  
 Instructed by Dr. Cherie Ding  
 
-- [HTML](https://rrwen.github.io/assign-cp8305-sls)
-- [PDF](https://github.com/rrwen/assign-cp8305-sls/blob/master/index.pdf)
+- [HTML](https://rrwen.github.io/assign-kd-sls)
+- [PDF](https://github.com/rrwen/assign-kd-sls/blob/master/index.pdf)
 
 ## References
 
