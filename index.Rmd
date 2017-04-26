@@ -746,7 +746,7 @@ barplot(impw, names.arg = names(impw), ylab = "Feature Importance", las=2)
 
 **A5. Cross Validation**  
   
-The row indices of the **wnk* bag of words matrix is then divided into 10 equal parts using `?caret::createFolds` to use as training and testing data for cross validation performance measures. See [Cross Validation] section.
+The row indices of the **wnk** bag of words matrix is then divided into 10 equal parts using `?caret::createFolds` to use as training and testing data for cross validation performance measures. See [Cross Validation] section.
 
 ```{r appendix-a5, eval=FALSE, echo=TRUE}
 
@@ -761,7 +761,7 @@ cv <- createFolds(1:nrow(wnk),
 
 **A6. Learners**  
 
-Learners were constructed using `?e1071::naiveBayes`, `?e1071::svm`, and `?randomForest::randomForest`. These were trained on 9 folds of the feature selected *wnk* bag of words matrix, and tested on the 1 remaining fold. This is done until all folds have been tested for. During the testing of each fold, `?caret::precision` and `?caret::recall` is used to calculate the F1 score and stored in a **results** variable. This **results** variable holds the F1 scores for each fold for each algorithm *$nbc*, *$rf* and *$svm*. See [Selected Learners] section.
+Learners were constructed using `?e1071::naiveBayes`, `?e1071::svm`, and `?randomForest::randomForest`. These were trained on 9 folds of the feature selected **wnk** bag of words matrix, and tested on the 1 remaining fold. This is done until all folds have been tested for. During the testing of each fold, `?caret::precision` and `?caret::recall` is used to calculate the F1 score and stored in a **results** variable. This **results** variable holds the F1 scores for each fold for each algorithm *\$nbc*, *\$rf* and *\$svm*. See [Selected Learners] section.
 
 \newpage
 

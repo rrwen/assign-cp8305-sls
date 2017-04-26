@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Experiments on Natural Language Processing and Prediction of Sentiment Labelled Sentences</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Experiments on Natural Language Processing and Prediction of Sentiment Labelled Sentences">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.3.18 and GitBook 2.6.7">
 
   <meta property="og:title" content="Experiments on Natural Language Processing and Prediction of Sentiment Labelled Sentences" />
   <meta property="og:type" content="book" />
@@ -32,7 +31,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-
 
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
@@ -93,6 +91,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <body>
 
 
+
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
 
     <div class="book-summary">
@@ -141,8 +140,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="header">
 <h1 class="title">Experiments on Natural Language Processing and Prediction of Sentiment Labelled Sentences</h1>
 <h3 class="subtitle"><em>Assignment Submission for Course CP8305 Instructed by Dr. Cherie Ding</em></h3>
-<h4 class="author"><em><p>Richard Wen<br />
-Ryerson University</p></em></h4>
+<h4 class="author"><em><div style="white-space: pre-line;">Richard Wen
+Ryerson University</div></em></h4>
 <h4 class="date"><em>April 13, 2017</em></h4>
 </div>
 
@@ -352,7 +351,7 @@ Figure 4.1: Flowchart of Methods
 </div>
 <div id="results" class="section level1">
 <h1><span class="header-section-number">5</span> Results</h1>
-<p>Figure <a href="#fig:fig2">5.1</a> shows the distribution of classes in the sentiment attribute. The results ranged from CV F1 scores of 0.28 to 0.71 per fold. Figure <a href="#fig:fig3">5.2</a> shows the average CV F1 scores obtained from the experiments. The word feature importances are also shown in Figure <a href="#fig:fig4">5.3</a>. The top ten word features based on feature importances was selected from these options, which produced a training feature matrix of 10 columns (reduced from 5189) by 3000 rows, with each <span class="math inline">\(k\)</span> column representing <span class="math inline">\(w^{k}\)</span> word vectors.</p>
+<p>Figure <a href="#fig:fig2">5.1</a> shows the distribution of classes in the sentiment attribute. The results ranged from CV F1 scores of 0.26 to 0.72 per fold. Figure <a href="#fig:fig3">5.2</a> shows the average CV F1 scores obtained from the experiments. The word feature importances are also shown in Figure <a href="#fig:fig4">5.3</a>. The top ten word features based on feature importances was selected from these options, which produced a training feature matrix of 10 columns (reduced from 5189) by 3000 rows, with each <span class="math inline">\(k\)</span> column representing <span class="math inline">\(w^{k}\)</span> word vectors.</p>
 <div class="figure"><span id="fig:fig2"></span>
 <img src="index_files/figure-html/fig2-1.png" alt="Sentiment Class Distribution" width="672" />
 <p class="caption">
@@ -430,8 +429,8 @@ packages &lt;-<span class="st"> </span><span class="kw">c</span>(
   <span class="st">&quot;caret&quot;</span>,
   <span class="st">&quot;e1071&quot;</span>
 )
-for (pkg in packages) {
-  if (!<span class="kw">requireNamespace</span>(pkg, <span class="dt">quietly=</span><span class="ot">TRUE</span>)) {
+<span class="cf">for</span> (pkg <span class="cf">in</span> packages) {
+  <span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(pkg, <span class="dt">quietly=</span><span class="ot">TRUE</span>)) {
     <span class="kw">install.packages</span>(pkg,
                      <span class="dt">dependencies=</span><span class="ot">TRUE</span>,
                      <span class="dt">repos=</span><span class="st">&quot;http://cran.rstudio.com/&quot;</span>)
@@ -455,7 +454,7 @@ zipped &lt;-<span class="st"> </span><span class="kw">file.path</span>(temp, <sp
 slsFolder &lt;-<span class="st"> </span><span class="kw">file.path</span>(temp, <span class="st">&quot;sentiment labelled sentences&quot;</span>)
 slsIgnore &lt;-<span class="st"> </span><span class="kw">file.path</span>(slsFolder, <span class="kw">c</span>(<span class="st">&quot;.DS_Store&quot;</span>, <span class="st">&quot;readme.txt&quot;</span>))
 slsFiles &lt;-<span class="st"> </span><span class="kw">list.files</span>(slsFolder, <span class="dt">full.names=</span><span class="ot">TRUE</span>)
-slsFiles &lt;-<span class="st"> </span>slsFiles[!slsFiles %in%<span class="st"> </span>slsIgnore]</code></pre></div>
+slsFiles &lt;-<span class="st"> </span>slsFiles[<span class="op">!</span>slsFiles <span class="op">%in%</span><span class="st"> </span>slsIgnore]</code></pre></div>
 <p><em>SLS Dataset Files</em></p>
 <table>
 <thead>
@@ -490,11 +489,11 @@ sls &lt;-<span class="st"> </span><span class="kw">sapply</span>(slsFiles, readL
 <span class="co"># 2. Extract sentence and sentiment attributes</span>
 x &lt;-<span class="st"> </span><span class="kw">c</span>() <span class="co"># sentence attribute</span>
 y &lt;-<span class="st"> </span><span class="kw">c</span>() <span class="co"># sentiment attribute</span>
-for (n in sls) { <span class="co"># each instance n</span>
+<span class="cf">for</span> (n <span class="cf">in</span> sls) { <span class="co"># each instance n</span>
   lx &lt;-<span class="st"> </span><span class="kw">nchar</span>(n) <span class="co"># sentence length</span>
-  xn &lt;-<span class="st"> </span><span class="kw">substr</span>(n, <span class="dv">1</span>, lx -<span class="st"> </span><span class="dv">2</span>) <span class="co"># sentence instance</span>
+  xn &lt;-<span class="st"> </span><span class="kw">substr</span>(n, <span class="dv">1</span>, lx <span class="op">-</span><span class="st"> </span><span class="dv">2</span>) <span class="co"># sentence instance</span>
   xn &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[[:punct:] ]+&#39;</span>,<span class="st">&#39; &#39;</span>, xn) <span class="co"># remove punctuation</span>
-  yn &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">substr</span>(n, lx -<span class="st"> </span><span class="dv">1</span>, lx)) <span class="co"># sentiment instance</span>
+  yn &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">substr</span>(n, lx <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, lx)) <span class="co"># sentiment instance</span>
   x &lt;-<span class="st"> </span><span class="kw">c</span>(x, xn)
   y &lt;-<span class="st"> </span><span class="kw">c</span>(y, yn)
 }
@@ -537,7 +536,7 @@ ds &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class=
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Features ----</span>
 
 <span class="co"># 0. Variables</span>
-xn &lt;-<span class="st"> </span>ds$sentence
+xn &lt;-<span class="st"> </span>ds<span class="op">$</span>sentence
 
 <span class="co"># 1. Obtain words wn for each xn using a tokenizer</span>
 wn &lt;-<span class="st"> </span><span class="kw">itoken</span>(xn, tolower, word_tokenizer)
@@ -608,15 +607,15 @@ wnk &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class=
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Selection ----</span>
 
 <span class="co"># 0. Variables</span>
-yn &lt;-<span class="st"> </span><span class="kw">as.factor</span>(ds$sentiment)
+yn &lt;-<span class="st"> </span><span class="kw">as.factor</span>(ds<span class="op">$</span>sentiment)
 
 <span class="co"># 1. Keep only words that occur more than 0.1% of occurences</span>
 freqc &lt;-<span class="st"> </span><span class="kw">apply</span>(wnk, <span class="dv">2</span>, sum)
-wnk &lt;-<span class="st"> </span>wnk[, <span class="kw">which</span>(freqc &gt;<span class="st"> </span><span class="kw">sum</span>(freqc) *<span class="st"> </span><span class="fl">0.001</span>)]
+wnk &lt;-<span class="st"> </span>wnk[, <span class="kw">which</span>(freqc <span class="op">&gt;</span><span class="st"> </span><span class="kw">sum</span>(freqc) <span class="op">*</span><span class="st"> </span><span class="fl">0.001</span>)]
 
 <span class="co"># 2. Remove highly correlated features over 0.05</span>
 wcor &lt;-<span class="st"> </span><span class="kw">findCorrelation</span>(<span class="kw">cor</span>(wnk), <span class="dt">cutoff =</span> <span class="fl">0.05</span>)
-wnk &lt;-<span class="st"> </span>wnk[, -wcor]
+wnk &lt;-<span class="st"> </span>wnk[, <span class="op">-</span>wcor]
 
 <span class="co"># 4. Calculate RF feature importances and select top 10</span>
 rfFit &lt;-<span class="st"> </span><span class="kw">randomForest</span>(
@@ -627,29 +626,29 @@ rfFit &lt;-<span class="st"> </span><span class="kw">randomForest</span>(
   <span class="dt">ntree =</span> <span class="dv">500</span>
 )
 impw &lt;-<span class="st"> </span><span class="kw">importance</span>(rfFit)[, <span class="dv">4</span>]
-impw &lt;-<span class="st"> </span>impw[<span class="kw">order</span>(-impw)]
-wnk &lt;-<span class="st"> </span>wnk[, <span class="kw">names</span>(impw)[<span class="dv">1</span>:<span class="dv">10</span>]]</code></pre></div>
+impw &lt;-<span class="st"> </span>impw[<span class="kw">order</span>(<span class="op">-</span>impw)]
+wnk &lt;-<span class="st"> </span>wnk[, <span class="kw">names</span>(impw)[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]]</code></pre></div>
 <p><em>Plot of the Feature Importances</em></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(impw, <span class="dt">names.arg =</span> <span class="kw">names</span>(impw), <span class="dt">ylab =</span> <span class="st">&quot;Feature Importance&quot;</span>, <span class="dt">las=</span><span class="dv">2</span>)</code></pre></div>
 <p><img src="index_files/figure-html/appendix-a4a-1.png" width="672" /></p>
 
 <p><strong>A5. Cross Validation</strong></p>
-<p>The row indices of the **wnk* bag of words matrix is then divided into 10 equal parts using <code>?caret::createFolds</code> to use as training and testing data for cross validation performance measures. See <a href="#cross-validation">Cross Validation</a> section.</p>
+<p>The row indices of the <strong>wnk</strong> bag of words matrix is then divided into 10 equal parts using <code>?caret::createFolds</code> to use as training and testing data for cross validation performance measures. See <a href="#cross-validation">Cross Validation</a> section.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Cross Validation ----</span>
 
 <span class="co"># Each element are the row ids of a 10 fold CV</span>
-cv &lt;-<span class="st"> </span><span class="kw">createFolds</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(wnk),
+cv &lt;-<span class="st"> </span><span class="kw">createFolds</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(wnk),
                   <span class="dt">k =</span> <span class="dv">10</span>,
                   <span class="dt">list =</span> <span class="ot">TRUE</span>,
                   <span class="dt">returnTrain =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><strong>A6. Learners</strong></p>
-<p>Learners were constructed using <code>?e1071::naiveBayes</code>, <code>?e1071::svm</code>, and <code>?randomForest::randomForest</code>. These were trained on 9 folds of the feature selected <em>wnk</em> bag of words matrix, and tested on the 1 remaining fold. This is done until all folds have been tested for. During the testing of each fold, <code>?caret::precision</code> and <code>?caret::recall</code> is used to calculate the F1 score and stored in a <strong>results</strong> variable. This <strong>results</strong> variable holds the F1 scores for each fold for each algorithm <em><span class="math inline">\(nbc*, *\)</span>rf</em> and <em>$svm</em>. See <a href="#selected-learners">Selected Learners</a> section.</p>
+<p>Learners were constructed using <code>?e1071::naiveBayes</code>, <code>?e1071::svm</code>, and <code>?randomForest::randomForest</code>. These were trained on 9 folds of the feature selected <strong>wnk</strong> bag of words matrix, and tested on the 1 remaining fold. This is done until all folds have been tested for. During the testing of each fold, <code>?caret::precision</code> and <code>?caret::recall</code> is used to calculate the F1 score and stored in a <strong>results</strong> variable. This <strong>results</strong> variable holds the F1 scores for each fold for each algorithm <em>$nbc</em>, <em>$rf</em> and <em>$svm</em>. See <a href="#selected-learners">Selected Learners</a> section.</p>
 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Learners ----</span>
 
 <span class="co"># 1. Set performance measures</span>
-precision &lt;-<span class="st"> </span>caret::precision
-recall &lt;-<span class="st"> </span>caret::recall
+precision &lt;-<span class="st"> </span>caret<span class="op">::</span>precision
+recall &lt;-<span class="st"> </span>caret<span class="op">::</span>recall
 
 <span class="co"># 2. Results list to collect Predictions</span>
 results &lt;-<span class="st"> </span><span class="kw">list</span>(
@@ -659,15 +658,15 @@ results &lt;-<span class="st"> </span><span class="kw">list</span>(
 )
 
 <span class="co"># 3. Predict on 10 fold CV</span>
-for (ids in cv) {
+<span class="cf">for</span> (ids <span class="cf">in</span> cv) {
   
   <span class="co"># 3.1 Training data</span>
   xtrain &lt;-<span class="st"> </span>wnk[ids, ]
   ytrain &lt;-<span class="st"> </span>yn[ids]
   
   <span class="co"># 3.2 Testing data</span>
-  xtest &lt;-<span class="st"> </span>wnk[-ids, ]
-  ytest &lt;-<span class="st"> </span>yn[-ids]
+  xtest &lt;-<span class="st"> </span>wnk[<span class="op">-</span>ids, ]
+  ytest &lt;-<span class="st"> </span>yn[<span class="op">-</span>ids]
   
   <span class="co"># 3.3 Create models</span>
   nbcModel &lt;-<span class="st"> </span><span class="kw">naiveBayes</span>(<span class="dt">x =</span> wnk, <span class="dt">y =</span> yn, <span class="dt">laplace =</span> <span class="dv">1</span>)
@@ -690,26 +689,26 @@ for (ids in cv) {
   rfRecall &lt;-<span class="st"> </span><span class="kw">recall</span>(rfPredict, ytest)
   
   <span class="co"># 3.6 Evaluate F1 Score</span>
-  nbcF1 &lt;-<span class="st"> </span>(<span class="dv">2</span> *<span class="st"> </span>nbcPrecision *<span class="st"> </span>nbcRecall) /<span class="st"> </span>(nbcPrecision +<span class="st"> </span>nbcRecall)
-  svmF1 &lt;-<span class="st"> </span>(<span class="dv">2</span> *<span class="st"> </span>svmPrecision *<span class="st"> </span>svmRecall) /<span class="st"> </span>(svmPrecision +<span class="st"> </span>svmRecall)
-  rfF1 &lt;-<span class="st"> </span>(<span class="dv">2</span> *<span class="st"> </span>rfPrecision *<span class="st"> </span>rfRecall) /<span class="st"> </span>(rfPrecision +<span class="st"> </span>rfRecall)
+  nbcF1 &lt;-<span class="st"> </span>(<span class="dv">2</span> <span class="op">*</span><span class="st"> </span>nbcPrecision <span class="op">*</span><span class="st"> </span>nbcRecall) <span class="op">/</span><span class="st"> </span>(nbcPrecision <span class="op">+</span><span class="st"> </span>nbcRecall)
+  svmF1 &lt;-<span class="st"> </span>(<span class="dv">2</span> <span class="op">*</span><span class="st"> </span>svmPrecision <span class="op">*</span><span class="st"> </span>svmRecall) <span class="op">/</span><span class="st"> </span>(svmPrecision <span class="op">+</span><span class="st"> </span>svmRecall)
+  rfF1 &lt;-<span class="st"> </span>(<span class="dv">2</span> <span class="op">*</span><span class="st"> </span>rfPrecision <span class="op">*</span><span class="st"> </span>rfRecall) <span class="op">/</span><span class="st"> </span>(rfPrecision <span class="op">+</span><span class="st"> </span>rfRecall)
   
   <span class="co"># 3.7 Add F1 score of fold to results</span>
-  results$nbc &lt;-<span class="st"> </span><span class="kw">c</span>(results$nbc, nbcF1)
-  results$svm &lt;-<span class="st"> </span><span class="kw">c</span>(results$svm, svmF1)
-  results$rf &lt;-<span class="st"> </span><span class="kw">c</span>(results$rf, rfF1)
+  results<span class="op">$</span>nbc &lt;-<span class="st"> </span><span class="kw">c</span>(results<span class="op">$</span>nbc, nbcF1)
+  results<span class="op">$</span>svm &lt;-<span class="st"> </span><span class="kw">c</span>(results<span class="op">$</span>svm, svmF1)
+  results<span class="op">$</span>rf &lt;-<span class="st"> </span><span class="kw">c</span>(results<span class="op">$</span>rf, rfF1)
 }</code></pre></div>
 
 <p><em>Plot of the Naive Bayes Classifier Results</em></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(results$nbc, <span class="dt">type =</span> <span class="st">&#39;l&#39;</span>, <span class="dt">ylab =</span> <span class="st">&quot;F1 Score&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;CV Fold&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(results<span class="op">$</span>nbc, <span class="dt">type =</span> <span class="st">&#39;l&#39;</span>, <span class="dt">ylab =</span> <span class="st">&quot;F1 Score&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;CV Fold&quot;</span>)</code></pre></div>
 <p><img src="index_files/figure-html/appendix-a6a-1.png" width="672" /></p>
 
 <p><em>Plot of the Random Forest Results</em></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(results$rf, <span class="dt">type =</span> <span class="st">&#39;l&#39;</span>, <span class="dt">ylab =</span> <span class="st">&quot;F1 Score&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;CV Fold&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(results<span class="op">$</span>rf, <span class="dt">type =</span> <span class="st">&#39;l&#39;</span>, <span class="dt">ylab =</span> <span class="st">&quot;F1 Score&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;CV Fold&quot;</span>)</code></pre></div>
 <p><img src="index_files/figure-html/appendix-a6b-1.png" width="672" /></p>
 
 <p><em>Plot of the Support Vector Machine Results</em></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(results$svm, <span class="dt">type =</span> <span class="st">&#39;l&#39;</span>, <span class="dt">ylab =</span> <span class="st">&quot;F1 Score&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;CV Fold&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(results<span class="op">$</span>svm, <span class="dt">type =</span> <span class="st">&#39;l&#39;</span>, <span class="dt">ylab =</span> <span class="st">&quot;F1 Score&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;CV Fold&quot;</span>)</code></pre></div>
 <p><img src="index_files/figure-html/appendix-a6c-1.png" width="672" /></p>
 </div>
 <div class="footnotes">
@@ -732,7 +731,8 @@ for (ids in cv) {
       </div>
 
 
-
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
